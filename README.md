@@ -78,3 +78,9 @@ The database contains a table called `hs` with seven columns.
 `prcsd`: Flag that gets set by crackdefault.sh to prevent duplicate calculation of default keys if a custom passphrase was used.
 
 Currently, the SQLite3 database is not password-protected.
+
+## Contributing
+
+Contributions are very welcome, especially additional modules to be able to crack more default keys.
+
+If you want to contribute, make sure your code is licensed under the MIT License (like this project). Other than that, just open up an issue briefly describing the changes and create a pull request!
