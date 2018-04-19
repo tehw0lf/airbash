@@ -50,19 +50,29 @@ When running Airbash for the first time, running `install.sh` will create the da
 ## Output
 
 `_n`: number of access points found
+
 `__c/m`: represents client number and maximum number of clients found, respectively
+
 `-`: access point is blacklisted
+
 `x`: access point already in database
+
 `?`: access point out of range (not visible to airodump anymore)
 
 ## The Database
 
 The database contains a table called `hs` with seven columns.
+
 `id`: incrementing counter of table entries
+
 `lat` and `lon`: GPS coordinates of the handshake (if available)
+
 `bssid`: MAC address of the access point
+
 `essid`: Name identifier
+
 `psk`: WPA Passphrase, if known
+
 `prcsd`: Flag that gets set by crackdefault.sh to prevent duplicate calculation of default keys if a custom passphrase was used.
 
 Currently, the SQLite3 database is not password-protected.
