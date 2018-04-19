@@ -31,7 +31,9 @@ the passphrase.
 
 ## Compiling Modules
 
-The modules for calculating [Thomson/SpeedTouch](https://packetstormsecurity.com/files/84788/STKeys-Thomson-WPA-Key-Recovery-Tool-1.0.html) and [UPC1234567](https://haxx.in/) (7 random digits) default keys are included in `modules/`. Credits for the code go to the authors Kevin Devine and <peter@haxx.in>.
+The modules for calculating [Thomson/SpeedTouch](https://packetstormsecurity.com/files/84788/STKeys-Thomson-WPA-Key-Recovery-Tool-1.0.html) and [UPC1234567](https://haxx.in/) (7 random digits) default keys are included in `modules/`
+
+Credits for the code go to the authors Kevin Devine and <peter@haxx.in>.
 
 ```bash
 On Linux:
