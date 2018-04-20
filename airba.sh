@@ -12,7 +12,7 @@
 
 checkPlatform() {
 	if [ ! -e "/system/bin/adb" ]; then
-    	DEVICE_ANDROID=1
+		DEVICE_ANDROID=1
 	else
 		DEVICE_LINUX=1
 	fi
