@@ -1,6 +1,6 @@
 # airba.sh
 
-Airbash is a fully automated WPA PSK handshake capture script aimed at penetration testing.
+Airbash is a POSIX-compliant, fully automated WPA PSK handshake capture script aimed at penetration testing.
 It is compatible with Bash and Android Shell (CM 10.2) and uses [aircrack-ng](https://aircrack-ng.org) to scan for
 clients that are currently connected to access points (AP).
 Those clients are then deauthenticated in order to capture the handshake when attempting to reconnect to the AP.
@@ -17,7 +17,7 @@ WiFi interface in monitor mode
 aircrack-ng
 SQLite3
 openssl for compilation of modules (optional)
-wlanhc2hcx from hcxtools (https://github.com/ZerBea/hcxtools/blob/master/wlanhc2hcx.c)
+[wlanhc2hcx](https://github.com/ZerBea/hcxtools/blob/master/wlanhc2hcx.c) from [hcxtools](https://github.com/ZerBea/hcxtools)
 
 In order to log GPS coordinates of handshakes, configure your coordinate logging software to log to .loc/*.txt (the filename can be chosen as desired.)
 Airbash will always use the first line of the output of `cat "$path$loc"*.txt 2>/dev/null | awk 'NR==0; END{print}'`, which equals to reading all .txt
@@ -84,4 +84,6 @@ Currently, the SQLite3 database is not password-protected.
 
 Contributions are very welcome, especially additional modules to be able to crack more default keys.
 
-If you want to contribute, make sure your code is licensed under the MIT License (like this project). Other than that, just open up an issue briefly describing the changes and create a pull request!
+If you want to contribute, make sure your code is licensed under the MIT License (like this project).
+When contributing shell code, please make sure it is POSIX-compliant.
+Other than that, just open up an issue briefly describing the changes and create a pull request!
