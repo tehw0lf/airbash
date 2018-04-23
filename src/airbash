@@ -159,7 +159,6 @@ ctr3=0
 # finalize by inserting data for captured handshakes into database
 # and converting the .pcap to a .hccapx file for use with hashcat
 for h in `ls "$path"*.cap 2>/dev/null`; do
-	cp "$h" bak/
 	if [ `"$AIRCRACK_BIN" -a 2 "$h" -w "$path$wl"known.txt 2>/dev/null | grep -c valid` -eq 0 ]; then
 		airstr=`"$AIRCRACK_BIN" -a 2 "$h" -w "$path$wl"known.txt 2>/dev/null | grep handshake`
 		getloc=`cat "$path$loc"*.txt 2>/dev/null | awk 'NR==0; END{print}'`

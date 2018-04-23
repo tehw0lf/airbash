@@ -1,5 +1,6 @@
 # installation path
 instpath=`pwd`
+
 # get platform
 if [ -d "/system" ]; then
     device=0  # android
@@ -30,7 +31,6 @@ echo "#!$sh_loc" > "$instpath/"crackdefault.sh
 cat "$instpath/src/crackdefault" >> "$instpath/crackdefault.sh"
 
 # create static files
-mkdir "$instpath/bak" &>/dev/null
 mkdir "$instpath/.loc" &>/dev/null
 echo "time,lat,lon,elevation,accuracy,bearing,speed" > "$instpath/.loc/default.txt"
 echo "2018-04-22T19:54:07Z,0.0,0.0,0.0,0.0,0.0,0.0" >> "$instpath/.loc/default.txt"
