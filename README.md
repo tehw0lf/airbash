@@ -17,6 +17,7 @@ WiFi interface in monitor mode
 aircrack-ng
 SQLite3
 openssl for compilation of modules (optional)
+wlanhc2hcx from hcxtools (https://github.com/ZerBea/hcxtools/blob/master/wlanhc2hcx.c)
 
 In order to log GPS coordinates of handshakes, configure your coordinate logging software to log to .loc/*.txt (the filename can be chosen as desired.)
 Airbash will always use the first line of the output of `cat "$path$loc"*.txt 2>/dev/null | awk 'NR==0; END{print}'`, which equals to reading all .txt
