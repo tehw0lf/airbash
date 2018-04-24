@@ -24,14 +24,22 @@ elif [ "$device" -eq 1 ]; then
     fi
 fi
 
-# set shebang
+# create files
 echo "#!$sh_loc" > "$instpath/"airba.sh
 cat "$instpath/src/airbash" >> "$instpath/airba.sh"
 echo "#!$sh_loc" > "$instpath/"crackdefault.sh
 cat "$instpath/src/crackdefault" >> "$instpath/crackdefault.sh"
 
+# create shortcuts that can be moved to a folder that is on $PATH
+echo "#!$sh_loc" > "$instpath/"airbash
+echo "cd $instpath" >> "$instpath/"airbash
+echo "./airba.sh $@" >> "$instpath/"airbash
+echo "#!$sh_loc" > "$instpath/"crackdefault
+echo "cd $instpath" >> "$instpath/"crackdefault
+echo "./crackdefault.sh $@" >> "$instpath/"crackdefault
+
 # create static files
-mkdir "$instpath/.loc" &>/dev/null
+mkdir "$instpath/.loc" # &>/dev/null
 echo "time,lat,lon,elevation,accuracy,bearing,speed" > "$instpath/.loc/default.txt"
 echo "2018-04-22T19:54:07Z,0.0,0.0,0.0,0.0,0.0,0.0" >> "$instpath/.loc/default.txt"
 
