@@ -32,7 +32,7 @@ the passphrase.
 
 ## Compiling Modules
 
-The modules for calculating [Thomson/SpeedTouch](https://packetstormsecurity.com/files/84788/STKeys-Thomson-WPA-Key-Recovery-Tool-1.0.html) and [UPC1234567](https://haxx.in/) (7 random digits) default keys are included in `modules/`
+The modules for calculating [Thomson/SpeedTouch](https://packetstormsecurity.com/files/84788/STKeys-Thomson-WPA-Key-Recovery-Tool-1.0.html) and [UPC1234567](https://haxx.in/) (7 random digits) default keys are included in `src/`
 
 Credits for the code go to the authors Kevin Devine and <peter@haxx.in>.
 
@@ -46,7 +46,7 @@ If on Android, you may need to copy the binaries to /system/xbin/ or to another 
 
 ## Usage
 
-When running Airbash for the first time, running `install.sh` will create the database.
+When running Airbash for the first time, running `install.sh` will create the database, prepare the folder structure and crete shortlinks to both scripts which can be moved to a directory that is on $PATH to allow execution from any location.
 `./airba.sh` starts the script, automatically scanning and attacking targets that are not found in the database.
 `./crackdefault.sh` attempts to break known default key algorithms.
 
@@ -82,7 +82,7 @@ Currently, the SQLite3 database is not password-protected.
 
 ## Contributing
 
-Contributions are very welcome, especially additional modules to be able to crack more default keys.
+Contributions are very welcome, especially additional modules to be able to crack more default keys. A template module is [included](https://github.com/tehw0lf/airbash/blob/master/modules/template.sh) in modules/. `crackdefault.sh` contains a template elif statement to include the new module.
 
 If you want to contribute, make sure your code is licensed under the MIT License (like this project).
 When contributing shell code, please make sure it is POSIX-compliant.
