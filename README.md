@@ -46,7 +46,10 @@ If on Android, you may need to copy the binaries to /system/xbin/ or to another 
 
 ## Usage
 
-When running Airbash for the first time, running `install.sh` will create the database, prepare the folder structure and crete shortlinks to both scripts which can be moved to a directory that is on $PATH to allow execution from any location.
+When running Airbash for the first time, running `install.sh` will create the database, prepare the folder structure and create shortlinks to both scripts which can be moved to a directory that is on $PATH to allow execution from any location.
+
+After installation, you may need to manually adjust `INTERFACE` on line 46 in `airba.sh`. This will later be determined automatically, but for now the default is set to `wlan0`, to allow out of the box compatibility with [bcmon](https://code.google.com/archive/p/bcmon/) on Android.
+
 `./airba.sh` starts the script, automatically scanning and attacking targets that are not found in the database.
 `./crackdefault.sh` attempts to break known default key algorithms.
 
