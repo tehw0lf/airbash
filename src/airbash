@@ -166,7 +166,7 @@ for h in `ls "$path"*.cap 2>/dev/null`; do
 			rm -f "$h"
 		else
 			b=`echo "$airstr" | awk '{print $2}'`
-			e=`echo "$airstr" | awk '{for (F=3;F<=NF-3;++F) printf " %s" ($F)}'`
+			e=`echo "$airstr" | awk '{for (F=3;F<=NF-3;++F) printf " %s", ($F)}'`
 			e=${e:1:${#e}}
 			lat=`echo "$getloc" | awk -F ',' '{print $2}'`
 			lon=`echo "$getloc" | awk -F ',' '{print $3}'`
