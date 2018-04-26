@@ -53,6 +53,8 @@ After installation, you may need to manually adjust `INTERFACE` on line 46 in `a
 `./airba.sh` starts the script, automatically scanning and attacking targets that are not found in the database.
 `./crackdefault.sh` attempts to break known default key algorithms.
 
+To view the database contents, run `sqlite3 .db.sqlite3 "SELECT * FROM hs"` in the main directory.
+
 ## Output
 
 `_n`: number of access points found
