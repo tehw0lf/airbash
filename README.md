@@ -1,7 +1,7 @@
 # airba.sh
 
 Airbash is a POSIX-compliant, fully automated WPA PSK handshake capture script aimed at penetration testing.
-It is compatible with Bash and Android Shell (using bcmon terminal on Cyanogenmod 10.2) and uses [aircrack-ng](https://aircrack-ng.org) to scan for clients that are currently connected to access points (AP).
+It is compatible with Bash and Android Shell (tested on Kali Linux and Cyanogenmod 10.2) and uses [aircrack-ng](https://aircrack-ng.org) to scan for clients that are currently connected to access points (AP).
 Those clients are then deauthenticated in order to capture the handshake when attempting to reconnect to the AP.
 Verification of a captured handshake is done using aircrack-ng. If one or more handshakes are captured, they are entered into an SQLite3 database, along with the time of capture and current GPS data (if properly configured).
 
@@ -41,7 +41,7 @@ If on Android, you may need to copy the binaries to /system/xbin/ or to another 
 
 ## Usage
 
-When running Airbash for the first time, running `install.sh` will create the database, prepare the folder structure and create shortlinks to both scripts which can be moved to a directory that is on $PATH to allow execution from any location.
+Running `install.sh` will create the database, prepare the folder structure and create shortlinks to both scripts which can be moved to a directory that is on $PATH to allow execution from any location.
 
 After installation, you may need to manually adjust `INTERFACE` on line 46 in `airba.sh`. This will later be determined automatically, but for now the default is set to `wlan0`, to allow out of the box compatibility with [bcmon](https://code.google.com/archive/p/bcmon/) on Android.
 
@@ -50,7 +50,7 @@ After installation, you may need to manually adjust `INTERFACE` on line 46 in `a
 
 To view the database contents, run `sqlite3 .db.sqlite3 "SELECT * FROM hs"` in the main directory.
 
-## Update (Linux only):
+## Update (Linux only ... for now):
 
 Airbash can be updated by executing `update.sh`. This will clone the master branch into /tmp/ and overwrite the local files.
 
