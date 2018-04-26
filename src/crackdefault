@@ -11,8 +11,7 @@ SQLITE3_BIN=`which sqlite3`
 
 # configure path and file names
 export PATH="$PATH:modules"
-WDIR=`pwd`  # android
-#WDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"  # linux
+WDIR=`realpath .`
 path="$WDIR"/
 hs=".hs/"
 wl=".wl/"

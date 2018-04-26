@@ -1,5 +1,5 @@
 # installation path
-instpath=`pwd`
+instpath=`realpath .`
 
 # get platform
 if [ -d "/system" ]; then

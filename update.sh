@@ -1,5 +1,5 @@
 # installation path
-instpath=`pwd`
+instpath=`realpath .`
 
 # get platform - there is no git on android
 if [ ! -d "/system" ]; then
