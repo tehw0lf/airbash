@@ -1,5 +1,5 @@
 # installation path
-instpath=`pwd`
+instpath=`realpath .`
 
 # get platform
 if [ -d "/system" ]; then
@@ -50,10 +50,12 @@ else
 fi
 chmod +x "$instpath/"crackdefault
 
-# create static files
-mkdir "$instpath/.loc" # &>/dev/null
-echo "time,lat,lon,elevation,accuracy,bearing,speed" > "$instpath/.loc/default.txt"
-echo "2018-04-22T19:54:07Z,0.0,0.0,0.0,0.0,0.0,0.0" >> "$instpath/.loc/default.txt"
+if [ ! -d "$instpath/.loc" ]; then
+    # create static files
+    mkdir "$instpath/.loc" # &>/dev/null
+    echo "time,lat,lon,elevation,accuracy,bearing,speed" > "$instpath/.loc/default.txt"
+    echo "2018-04-22T19:54:07Z,0.0,0.0,0.0,0.0,0.0,0.0" >> "$instpath/.loc/default.txt"
+fi
 
 # seed database
 sqlite3 .db.sqlite3 "CREATE TABLE hs (id INTEGER PRIMARY KEY NOT NULL, lat VARCHAR(12), lon VARCHAR(12), bssid VARCHAR(17) UNIQUE, essid VARCHAR(255), psk VARCHAR(64), prcsd INT(1) DEFAULT NULL)"
