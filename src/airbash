@@ -161,7 +161,7 @@ ctr3=0
 for h in `ls "$path"*.cap 2>/dev/null`; do
 	if [ `"$AIRCRACK_BIN" -a 2 "$h" -w "$path$wl"known.txt 2>/dev/null | grep -c valid` -eq 0 ]; then
 		airstr=`"$AIRCRACK_BIN" -a 2 "$h" -w "$path$wl"known.txt 2>/dev/null | grep handshake`
-		getloc=`cat "$path$loc"*.txt 2>/dev/null | awk 'NR==0; END{print}'`
+		getloc=`cat "$path$loc"*.txt 2>/dev/null | sed '2q;d'`
 		if [ `echo "$airstr" | grep -c handshake` -eq 0 ]; then
 			rm -f "$h"
 		else
