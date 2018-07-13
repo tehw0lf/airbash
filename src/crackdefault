@@ -9,7 +9,7 @@ AIRCRACK_BIN=$(which aircrack-ng)
 SQLITE3_BIN=$(which sqlite3)
 
 # configure path and file names
-export PATH="$PATH:modules"
+export PATH="$PATH:modules:bin"
 WDIR=$(realpath .)
 path="$WDIR"/
 hs=".hs/"
