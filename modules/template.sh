@@ -1,7 +1,9 @@
 # airbash module template
 # generate keys
-$("cli command for 2.4 ghz" >>"$path"wltmplatetmp)
-$("cli command for 5 ghz if available" >>"$path"wltmplatetmp)
+
+MODULE_BIN=$(pathttobin)
+$("$MODULE_BIN cli command for 2.4 ghz" >>"$path"wltmplatetmp)
+$("$MODULE_BIN cli command for 5 ghz if available" >>"$path"wltmplatetmp)
 
 # clean program output if necessary
 for j in $(cat "$path"wltmplatetmp | "applying awk filter"); do

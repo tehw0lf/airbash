@@ -1,8 +1,9 @@
 # this module uses the compiled binary of upc_keys.c by <peter@haxx.in> (https://haxx.in/upc_keys.c)
 # to compile it, use gcc -O2 -o modules/upckeys modules/upc_keys.c -lcrypto (requires openssl)
 # generate keys
-$(upckeys "$essid" "24" >>"$path"wlupctmp)
-$(upckeys "$essid" "5" >>"$path"wlupctmp)
+UPC_BIN=$(which upckeys)
+$($UPC_BIN "$essid" "24" >>"$path"wlupctmp)
+$($UPC_BIN "$essid" "5" >>"$path"wlupctmp)
 # clean program output
 for j in $(cat "$path"wlupctmp 2>/dev/null | awk -F\' '{print $4}'); do
   echo "$j" >>"$path"wlupc
