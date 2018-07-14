@@ -17,7 +17,7 @@ SQLite3
 openssl for compilation of modules (optional)
 [wlanhc2hcx](https://github.com/ZerBea/hcxtools/blob/master/wlanhc2hcx.c) from [hcxtools](https://github.com/ZerBea/hcxtools)
 
-In order to log GPS coordinates of handshakes, configure your coordinate logging software to log to .loc/*.txt (the filename can be chosen as desired). Airbash will always use the output of `cat "$path$loc"*.txt 2>/dev/null | awk 'NR==0; END{print}'`, which equals to reading all .txt files in .loc/ and picking the second line. The reason for this way of implementation is the functionality of [GPSLogger](https://play.google.com/store/apps/details?id=com.mendhak.gpslogger&hl=en), which was used on the development device.
+In order to log GPS coordinates of handshakes, configure your coordinate logging software to log to .loc/_.txt (the filename can be chosen as desired). Airbash will always use the output of `cat "$path$loc"_.txt 2>/dev/null | awk 'NR==0; END{print}'`, which equals to reading all .txt files in .loc/ and picking the second line. The reason for this way of implementation is the functionality of [GPSLogger](https://play.google.com/store/apps/details?id=com.mendhak.gpslogger&hl=en), which was used on the development device.
 
 ## Calculating default keys
 
@@ -29,13 +29,15 @@ the passphrase.
 
 The modules for calculating [Thomson/SpeedTouch](https://packetstormsecurity.com/files/84788/STKeys-Thomson-WPA-Key-Recovery-Tool-1.0.html) and [UPC1234567](https://haxx.in/) (7 random digits) default keys are included in `src/`
 
-Credits for the code go to the authors Kevin Devine and <peter@haxx.in>.
+Credits for the code go to the authors Kevin Devine and <mailto:peter@haxx.in>.
 
 ```bash
 On Linux:
 gcc -fomit-frame-pointer -O3 -funroll-all-loops -o modules/st modules/stkeys.c -lcrypto
 gcc -O2 -o modules/upckeys modules/upc_keys.c -lcrypto
 ```
+
+In order to enable auto detection, please move the binaries to `airbash/bin` (will be added to `PATH` during execution) or a directory that's on `PATH`.
 
 If on Android, you may need to copy the binaries to /system/xbin/ or to another directory where binary execution is allowed.
 
