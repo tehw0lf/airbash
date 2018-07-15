@@ -17,7 +17,7 @@ SQLite3
 openssl for compilation of modules (optional)
 [wlanhc2hcx](https://github.com/ZerBea/hcxtools/blob/master/wlanhc2hcx.c) from [hcxtools](https://github.com/ZerBea/hcxtools)
 
-In order to log GPS coordinates of handshakes, configure your coordinate logging software to log to .loc/_.txt (the filename can be chosen as desired). Airbash will always use the output of `cat "$path$loc"_.txt 2>/dev/null | awk 'NR==0; END{print}'`, which equals to reading all .txt files in .loc/ and picking the second line. The reason for this way of implementation is the functionality of [GPSLogger](https://play.google.com/store/apps/details?id=com.mendhak.gpslogger&hl=en), which was used on the development device.
+In order to log GPS coordinates of handshakes, configure your coordinate logging software to log to .loc/_.txt (the filename can be chosen as desired). Airbash will always use the output of `cat "$path$loc"*.txt 2>/dev/null | sed '2q;d'`, which equals to reading all .txt files in .loc/ and picking the second line. The reason for this way of implementation is the functionality of [GPSLogger](https://play.google.com/store/apps/details?id=com.mendhak.gpslogger&hl=en), which was used on the development device.
 
 ## Calculating default keys
 
