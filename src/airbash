@@ -28,14 +28,14 @@ airocheck() {
 }
 airekill() {
   # kill all instances of aireplay-ng to prevent locking
-  for a in $(pgrep $(basename "$AIREPLAY_BIN")); do
-    kill -9 $a &>/dev/null
+  for pid in $(pgrep $(basename "$AIREPLAY_BIN")); do
+    { kill $pid && wait $pid; } &>/dev/null
   done
 }
 airokill() {
   # kill all instances of airodump-ng to prevent locking
-  for a in $(pgrep $(basename "$AIRODUMP_BIN")); do
-    kill -9 $a &>/dev/null
+  for pid in $(pgrep $(basename "$AIRODUMP_BIN")); do
+    { kill $pid && wait $pid; } &>/dev/null
   done
 }
 
