@@ -11,11 +11,17 @@ Speedport 500-700 series, Thomson/SpeedTouch and UPC 7 digits (UPC1234567) route
 
 ## Requirements
 
-WiFi interface in monitor mode
-aircrack-ng
-SQLite3
-openssl for compilation of modules (optional)
+WiFi interface in monitor mode (on Android this can be achieved by using [bcmon](https://code.google.com/archive/p/bcmon/) if the device is compatible)
+
+aircrack-ng (for Android [android_aircrack](https://github.com/kriswebdev/android_aircrack) prebuilt binaries can be used)
+
+SQLite3 (Android: installed by default on CyanogenMod 10.2)
+
 [wlanhc2hcx](https://github.com/ZerBea/hcxtools/blob/master/wlanhc2hcx.c) from [hcxtools](https://github.com/ZerBea/hcxtools)
+
+
+openssl for compilation of modules (optional, not used for handshake capture)
+
 
 In order to log GPS coordinates of handshakes, configure your coordinate logging software to log to .loc/_.txt (the filename can be chosen as desired). Airbash will always use the output of `cat "$path$loc"*.txt 2>/dev/null | sed '2q;d'`, which equals to reading all .txt files in .loc/ and picking the second line. The reason for this way of implementation is the functionality of [GPSLogger](https://play.google.com/store/apps/details?id=com.mendhak.gpslogger&hl=en), which was used on the development device.
 
