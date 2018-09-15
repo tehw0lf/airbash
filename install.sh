@@ -26,10 +26,10 @@ fi
 
 # create files
 echo "#!$sh_loc" >"$instpath/"airba.sh
-cat "$instpath/src/airbash" >>"$instpath/airba.sh"
+cat "$instpath/src/airba.sh" >>"$instpath/airba.sh"
 chmod +x "$instpath/"airba.sh
 echo "#!$sh_loc" >"$instpath/"crackdefault.sh
-cat "$instpath/src/crackdefault" >>"$instpath/crackdefault.sh"
+cat "$instpath/src/crackdefault.sh" >>"$instpath/crackdefault.sh"
 chmod +x "$instpath/"crackdefault.sh
 
 # create shortcuts that can be moved to a folder that is on $PATH
