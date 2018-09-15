@@ -1,5 +1,7 @@
 # airba.sh
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/6edeb433a77c47a5b7a670906fd06006)](https://app.codacy.com/app/tehw0lf/airbash?utm_source=github.com&utm_medium=referral&utm_content=tehw0lf/airbash&utm_campaign=Badge_Grade_Dashboard)
+
 Airbash is a POSIX-compliant, fully automated WPA PSK handshake capture script aimed at penetration testing.
 It is compatible with Bash and Android Shell (tested on Kali Linux and Cyanogenmod 10.2) and uses [aircrack-ng](https://aircrack-ng.org) to scan for clients that are currently connected to access points (AP).
 Those clients are then deauthenticated in order to capture the handshake when attempting to reconnect to the AP.
