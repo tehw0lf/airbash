@@ -1,14 +1,21 @@
 # keygen code adapted from https://www.zebradem.com/wiki/index.php?title=Router_Standardpassw%C3%B6rter#.28diverse_Modelle:_500.2C_700.2C_....29
 # generate keys
 PRE="SP-"
-D=${bssid:13:1}
-E=${bssid:15:1}
-F=${bssid:16:1}
-G=${essid:9:1}
-H=${essid:10:1}
-for X in {0..9}; do
-  for Y in {0..9}; do
-    for Z in {0..9}; do
+essid="sampleessid"
+bssid="00-FF-6F-36-2C-E9"
+D=$(echo $bssid | cut -c14)
+echo $D
+E=$(echo $bssid | cut -c16)
+echo $E
+F=$(echo $bssid | cut -c17)
+echo $F
+G=$(echo $essid | cut -c10)
+echo $G
+H=$(echo $essid | cut -c11)
+echo $H
+for X in $(seq 0 9); do
+  for Y in $(seq 0 9); do
+    for Z in $(seq 0 9); do
       echo $PRE$G$Z$H$D$E$F$X$Y$Z >>"$path"wlspeedport
     done
   done
