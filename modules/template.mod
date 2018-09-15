@@ -6,7 +6,7 @@ $("$MODULE_BIN cli command for 2.4 ghz" >>"$path"wltmplatetmp)
 $("$MODULE_BIN cli command for 5 ghz if available" >>"$path"wltmplatetmp)
 
 # clean program output if necessary
-for j in $(cat "$path"wltmplatetmp | "applying awk filter"); do
+for j in $("applying awk filter" "$path"wltmplatetmp 2>/dev/null); do
   echo "$j" >>"$path"wltmplate
 done
 

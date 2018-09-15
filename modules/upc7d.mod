@@ -5,7 +5,7 @@ UPC_BIN=$(which upckeys)
 $($UPC_BIN "$essid" "24" >>"$path"wlupctmp)
 $($UPC_BIN "$essid" "5" >>"$path"wlupctmp)
 # clean program output
-for j in $(cat "$path"wlupctmp 2>/dev/null | awk -F\' '{print $4}'); do
+for j in $(awk -F\' '{print $4}' "$path"wlupctmp 2>/dev/null); do
   echo "$j" >>"$path"wlupc
 done
 # test keys
