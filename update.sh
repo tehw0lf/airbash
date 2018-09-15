@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # installation path
 instpath=$(realpath .)
 
