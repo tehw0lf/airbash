@@ -11,6 +11,10 @@ After capture, the database can be tested for vulnerable router models using `cr
 It will search for entries that match the implemented modules, which currently include algorithms to compute default keys for
 Speedport 500-700 series, Thomson/SpeedTouch and UPC 7 digits (UPC1234567) routers.
 
+## Sample Run
+
+[![asciicast](https://asciinema.org/a/pIfGjdsqaNoINE5w0ItvfYK2i.svg)](https://asciinema.org/a/pIfGjdsqaNoINE5w0ItvfYK2i)
+
 ## Requirements
 
 WiFi interface in monitor mode (on Android this can be achieved by using [bcmon](https://code.google.com/archive/p/bcmon/) if the device is compatible)
@@ -21,11 +25,9 @@ SQLite3 (Android: installed by default on CyanogenMod 10.2)
 
 [wlanhc2hcx](https://github.com/ZerBea/hcxtools/blob/master/wlanhc2hcx.c) from [hcxtools](https://github.com/ZerBea/hcxtools)
 
-
 openssl for compilation of modules (optional, not used for handshake capture)
 
-
-In order to log GPS coordinates of handshakes, configure your coordinate logging software to log to .loc/_.txt (the filename can be chosen as desired). Airbash will always use the output of `cat "$path$loc"*.txt 2>/dev/null | sed '2q;d'`, which equals to reading all .txt files in .loc/ and picking the second line. The reason for this way of implementation is the functionality of [GPSLogger](https://play.google.com/store/apps/details?id=com.mendhak.gpslogger&hl=en), which was used on the development device.
+In order to log GPS coordinates of handshakes, configure your coordinate logging software to log to .loc/\_.txt (the filename can be chosen as desired). Airbash will always use the output of `cat "$path$loc"*.txt 2>/dev/null | sed '2q;d'`, which equals to reading all .txt files in .loc/ and picking the second line. The reason for this way of implementation is the functionality of [GPSLogger](https://play.google.com/store/apps/details?id=com.mendhak.gpslogger&hl=en), which was used on the development device.
 
 ## Calculating default keys
 
@@ -51,7 +53,7 @@ If on Android, you may need to copy the binaries to /system/xbin/ or to another 
 
 ## Usage
 
-Running `install.sh` will create the database, prepare the folder structure and create shortlinks to both scripts which can be moved to a directory that is on $PATH to allow execution from any location.
+Running `install.sh` will create the database, prepare the folder structure and create shortlinks to both scripts which can be moved to a directory that is on \$PATH to allow execution from any location.
 
 After installation, you may need to manually adjust `INTERFACE` on line 46 in `airba.sh`. This will later be determined automatically, but for now the default is set to `wlan0`, to allow out of the box compatibility with [bcmon](https://code.google.com/archive/p/bcmon/) on Android.
 
@@ -60,7 +62,7 @@ After installation, you may need to manually adjust `INTERFACE` on line 46 in `a
 
 To view the database contents, run `sqlite3 .db.sqlite3 "SELECT * FROM hs"` in the main directory.
 
-## Update (Linux only ... for now):
+## Update (Linux only ... for now)
 
 Airbash can be updated by executing `update.sh`. This will clone the master branch into /tmp/ and overwrite the local files.
 
