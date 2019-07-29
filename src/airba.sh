@@ -38,6 +38,7 @@ INTERFACE="wlp1s0"
 AIRCRACK_BIN=$(which aircrack-ng)
 AIRODUMP_BIN=$(which airodump-ng)
 AIREPLAY_BIN=$(which aireplay-ng)
+AIRMON_BIN=$(which airmon-ng)
 SQLITE3_BIN=$(which sqlite3)
 HC2HCX_BIN=$(which wlanhc2hcx)
 
@@ -61,6 +62,8 @@ if [ -z "HC2HCX_BIN" ]; then
   echo -e "Make sure the path to hcxtools' wlanhc2hcx is correct!\nhttps://github.com/ZerBea/hcxtools/blob/master/wlanhc2hcx.c"
   exit
 fi
+$AIRMON_BIN start $INTERFACE
+
 
 # configure path variables
 path="$WDIR/"
