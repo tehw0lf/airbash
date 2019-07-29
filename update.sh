@@ -8,7 +8,7 @@ if [ ! -d "/system" ]; then
 
   # download latest version
   rm -rf "$tmp/"
-  git clone https://github.com/tehw0lf/airbash "$tmp/"
+  git clone https://github.com/D4rk4/airbash "$tmp/"
   cp -R "$tmp/." "$instpath/" 2>/dev/null # suppress git overwrite errors
   echo "installing update... INTERFACE will be reset to wlan0"
   sh "$instpath/"install.sh
