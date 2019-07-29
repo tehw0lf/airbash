@@ -53,7 +53,11 @@ for i in $("$SQLITE3_BIN" "$path$db" "SELECT * FROM hs WHERE psk IS NULL AND prc
     echo "UPC detected, computing default keys"
     . upc7d.sh
 
-    # template for module creation
+  elif [[ `echo $essid | grep -c -oE 'HOTBOX-'` -gt 0  ]]; then
+   	echo "HOTBOX detected, computing default keys"
+  	. hotbox.sh
+  
+  # template for module creation
     #	elif [[ `echo $essid | grep -c -oE 'SSIDSTYLE'` -gt 0  ]]; then
     #		echo "Template detected, computing default keys"
     #		. template.sh
