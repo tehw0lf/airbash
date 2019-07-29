@@ -54,8 +54,8 @@ for i in $("$SQLITE3_BIN" "$path$db" "SELECT * FROM hs WHERE psk IS NULL AND prc
     . upc7d.sh
 
   elif [[ `echo $essid | grep -c -oE 'HOTBOX-'` -gt 0  ]]; then
-   	echo "HOTBOX detected, computing default keys"
-  	. hotbox.sh
+    echo "HOTBOX detected, computing default keys"
+    . hotbox.sh
   
   # template for module creation
     #	elif [[ `echo $essid | grep -c -oE 'SSIDSTYLE'` -gt 0  ]]; then
