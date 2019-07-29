@@ -34,7 +34,7 @@ airokill() {
 
 # enviro stuff
 WDIR=$(realpath .)
-INTERFACE="wlan0"
+INTERFACE="wlp1s0"
 AIRCRACK_BIN=$(which aircrack-ng)
 AIRODUMP_BIN=$(which airodump-ng)
 AIREPLAY_BIN=$(which aireplay-ng)
