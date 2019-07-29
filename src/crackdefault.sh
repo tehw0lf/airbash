@@ -37,23 +37,28 @@ for i in $("$SQLITE3_BIN" "$path$db" "SELECT * FROM hs WHERE psk IS NULL AND prc
     echo "Speedport 500/700 detected, computing default keys (1000 keys)"
     . sp5700.sh
 
-    # Thomson
+  # Thomson
   elif [[ $(echo $essid | grep -c -oE 'Thomson[0-9a-zA-Z]{6}') -gt 0 ]]; then
     tessid=${essid#Thomson}
     echo "Thomson/SpeedTouch detected, computing default keys for production dates between 2005 and 2009"
     . st.sh
-    # SpeedTouch
+  # SpeedTouch
   elif [[ $(echo $essid | grep -c -oE 'SpeedTouch[0-9a-zA-Z]{6}') -gt 0 ]]; then
     tessid=${essid#SpeedTouch}
     echo "SpeedTouch detected, computing default keys for production dates between 2005 and 2009"
     . st.sh
 
-    # UPC 7 digits
+  # UPC 7 digits
   elif [[ $(echo $essid | grep -c -oE 'UPC[0-9]{7}') -gt 0 ]]; then
     echo "UPC detected, computing default keys"
     . upc7d.sh
 
-    # template for module creation
+  # HOTBOX
+  elif [[ `echo $essid | grep -c -oE 'HOTBOX-'` -gt 0  ]]; then
+    echo "HOTBOX detected, computing default keys"
+    . hotbox.sh
+  
+  # template for module creation
     #	elif [[ `echo $essid | grep -c -oE 'SSIDSTYLE'` -gt 0  ]]; then
     #		echo "Template detected, computing default keys"
     #		. template.sh
