@@ -9,7 +9,7 @@ Verification of a captured handshake is done using aircrack-ng. If one or more h
 
 After capture, the database can be tested for vulnerable router models using `crackdefault.sh`.
 It will search for entries that match the implemented modules, which currently include algorithms to compute default keys for
-Speedport 500-700 series, Thomson/SpeedTouch and UPC 7 digits (UPC1234567) routers.
+Speedport 500-700 series, Thomson/SpeedTouch, UPC 7 digits (UPC1234567) and HOTBOX routers.
 
 ## Sample Run
 
@@ -103,3 +103,6 @@ Contributions are very welcome, especially additional modules to be able to crac
 If you want to contribute, make sure your code is licensed under the MIT License (like this project).
 When contributing shell scripts, please make sure the code is POSIX-compliant.
 Other than that, just open up an issue briefly describing the changes and create a pull request!
+
+Contributors:
+@D4rk4 (committed the [HOTBOX](https://github.com/tehw0lf/airbash/blob/master/modules/hotbox.sh) module!)
