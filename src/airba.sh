@@ -62,8 +62,8 @@ if [ -z "HC2HCX_BIN" ]; then
   echo -e "Make sure the path to hcxtools' wlanhc2hcx is correct!\nhttps://github.com/ZerBea/hcxtools/blob/master/wlanhc2hcx.c"
   exit
 fi
-$AIRMON_BIN check kill
-$AIRMON_BIN start $INTERFACE
+#$AIRMON_BIN check kill
+#$AIRMON_BIN start $INTERFACE
 
 
 # configure path variables
