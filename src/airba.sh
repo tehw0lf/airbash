@@ -13,7 +13,11 @@ airocheck() {
   # returns 1 on success and 0 on failure
   for s in $(ls "$1"*.cap 2>/dev/null); do
     if [ $("$AIRCRACK_BIN" -a 2 "$s" -w "$path$wl"known.txt 2>/dev/null | grep -c valid) -eq 0 ]; then
-      if [ $("$AIRCRACK_BIN" -a 2 "$s" -w "$path$wl"known.txt 2>/dev/null | awk '{print $NF}' | grep -c handshake) -ne 0 ]; then
+      airstrtmp=$("$AIRCRACK_BIN" -a 2 "$s" -w "$path$wl"known.txt 2>/dev/null | grep handshake)
+      numhs=$(echo "$airstrtmp" | awk '{print $5}')
+      if [ "$numhs" == "(0" ]; then
+        cs=0
+      else
         cs=1
       fi
     fi
@@ -153,7 +157,7 @@ for h in $(ls "$path"*.cap 2>/dev/null); do
   if [ $("$AIRCRACK_BIN" -a 2 "$h" -w "$path$wl"known.txt 2>/dev/null | grep -c valid) -eq 0 ]; then
     airstr=$("$AIRCRACK_BIN" -a 2 "$h" -w "$path$wl"known.txt 2>/dev/null | grep handshake)
     getloc=$(sed '2q;d' "$path$loc"*.txt 2>/dev/null)
-    if [ $(echo "$airstr" | grep -c handshake) -eq 0 ]; then
+    if [ $(echo "$airstr" | awk '{print $5}') == "(0" ]; then
       rm -f "$h"
     else
       b=$(echo "$airstr" | awk '{print $2}')
