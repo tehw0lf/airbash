@@ -105,4 +105,4 @@ When contributing shell scripts, please make sure the code is POSIX-compliant.
 Other than that, just open up an issue briefly describing the changes and create a pull request!
 
 Contributors:
-@D4rk4 (committed the [HOTBOX](https://github.com/tehw0lf/airbash/blob/master/modules/hotbox.sh) module!)
+[D4rk4](https://github.com/D4rk4/) (committed the [HOTBOX](https://github.com/tehw0lf/airbash/blob/master/modules/hotbox.sh) module!)
