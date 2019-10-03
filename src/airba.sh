@@ -19,7 +19,9 @@ airocheck() {
       else      
         numhstmp=$(echo "$airstrtmp" | awk '{print $5}')
         if [ "$numhstmp" != "(0" ]; then
-         cs=1
+          cs=1
+        else
+          cs=0
         fi
       fi
     fi
