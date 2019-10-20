@@ -50,11 +50,11 @@ else
 fi
 chmod +x "$installation_path/"crackdefault
 
-if [ ! -d "$installation_path/.loc" ]; then
+if [ ! -d "$installation_path/.location" ]; then
   # create static location file
-  mkdir "$installation_path/.loc"
-  echo "time,lat,lon,elevation,accuracy,bearing,speed" >"$installation_path/.loc/default.txt"
-  echo "2018-04-22T19:54:07Z,0.0,0.0,0.0,0.0,0.0,0.0" >>"$installation_path/.loc/default.txt"
+  mkdir "$installation_path/.location"
+  echo "time,lat,lon,elevation,accuracy,bearing,speed" >"$installation_path/.location/default.txt"
+  echo "2018-04-22T19:54:07Z,0.0,0.0,0.0,0.0,0.0,0.0" >>"$installation_path/.location/default.txt"
 fi
 
 # seed database
