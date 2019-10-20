@@ -23,7 +23,7 @@ aircrack-ng (for Android [android_aircrack](https://github.com/kriswebdev/androi
 
 SQLite3 (Android: installed by default on CyanogenMod 10.2)
 
-[wlanhc2hcx](https://github.com/ZerBea/hcxtools/blob/master/wlanhc2hcx.c) from [hcxtools](https://github.com/ZerBea/hcxtools)
+[wlanhc2hcx](https://github.com/ZerBea/hcxtools/blob/master/wlanhc2hcx.c) from [hcxtools](https://github.com/ZerBea/hcxtools) (Optional, used for converting .cap files to .hccapx files for hashcat)
 
 openssl for compilation of modules (optional, not used for handshake capture)
 
