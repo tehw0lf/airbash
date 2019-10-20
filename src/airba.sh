@@ -110,7 +110,7 @@ for access_point in $(tr -d ' ' < $base_directory/$initial_scan_file 2>/dev/null
     access_point_counter=$((access_point_counter + 1))
     continue
   fi
-  if [ $("$SQLITE3_BINARY" "$base_directory/$database_filename" "SELECT * FROM handshake_directory WHERE bssid='$access_point'" 2>/dev/null | grep -c $access_point) -gt 0 ]; then
+  if [ $("$SQLITE3_BINARY" "$base_directory/$database_filename" "SELECT * FROM handshakes WHERE bssid='$access_point'" 2>/dev/null | grep -c $access_point) -gt 0 ]; then
     # handshake for access point present in database
     echo "x         "
     kill_airodump_processes
