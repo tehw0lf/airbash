@@ -10,24 +10,23 @@ SQLITE3_BIN=$(which sqlite3)
 
 # configure path and file names
 export PATH="$PATH:modules:bin"
-WDIR=$(realpath .)
-path="$WDIR"/
-hs=".hs/"
-wl=".wl/"
-db=".db.sqlite3"
+working_directory=$(realpath .)
+handshake_directory="$working_directory/.handshakes"
+wordlist_directory="$working_directory/.wordlists"
+database_file=".database.sqlite3"
 IFS=$'\n'
-for i in $("$SQLITE3_BIN" "$path$db" "SELECT * FROM hs WHERE psk IS NULL AND prcsd IS NULL" 2>/dev/null); do
+for handshake_data in $("$SQLITE3_BIN" "$working_directory/$database_file" "SELECT * FROM handshakes WHERE psk IS NULL AND processed IS NULL" 2>/dev/null); do
   unset IFS
   # get ssids for current handshake
-  bssid=$(echo "$i" | awk -F '|' '{print $4}')
-  essid=$(echo "$i" | awk -F '|' '{print $5}')
+  bssid=$(echo "$handshake_data" | awk -F '|' '{print $4}')
+  essid=$(echo "$handshake_data" | awk -F '|' '{print $5}')
 
   # check against list of known passwords
-  psk=$("$AIRCRACK_BIN" "$path$hs$bssid"*.cap -w "$path$wl"known 2>/dev/null | grep FOUND | sort -u | awk '{print $4}')
+  psk=$("$AIRCRACK_BIN" "$handshake_directory/$bssid"*.cap -w "$wordlist_directory"known_passwords 2>/dev/null | grep FOUND | sort -u | awk '{print $4}')
   if [ ${#psk} -gt 7 ]; then
     echo "Key found for BSSID $bssid: $psk"
-    "$SQLITE3_BIN" "$path$db" "UPDATE hs SET psk='$psk', prcsd=1 WHERE bssid='$bssid';" 2>/dev/null
-    mv "$path$hs$bssid"* "$path$hs".cracked/ 2>/dev/null
+    "$SQLITE3_BIN" "$working_directory/$database_file" "UPDATE handshakes SET psk='$psk', processed=1 WHERE bssid='$bssid';" 2>/dev/null
+    mv "$handshake_directory/$bssid"* "$handshake_directory".cracked/ 2>/dev/null
     continue
   fi
 
@@ -65,4 +64,4 @@ for i in $("$SQLITE3_BIN" "$path$db" "SELECT * FROM hs WHERE psk IS NULL AND prc
   fi
 done
 
-rm -f "$path$hs".cracked/*.cap 2>/dev/null
+rm -f "$handshake_directory/".cracked/*.cap 2>/dev/null
