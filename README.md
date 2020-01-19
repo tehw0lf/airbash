@@ -2,14 +2,16 @@
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/6edeb433a77c47a5b7a670906fd06006)](https://app.codacy.com/app/tehw0lf/airbash?utm_source=github.com&utm_medium=referral&utm_content=tehw0lf/airbash&utm_campaign=Badge_Grade_Dashboard)
 
-Airbash is a POSIX-compliant, fully automated WPA PSK handshake capture script aimed at penetration testing.
+Airbash is a POSIX-compliant, fully automated WPA PSK [PMKID](https://hashcat.net/forum/thread-7717.html) and handshake capture script aimed at penetration testing.
 It is compatible with Bash and Android Shell (tested on Kali Linux and Cyanogenmod 10.2) and uses [aircrack-ng](https://aircrack-ng.org) to scan for clients that are currently connected to access points (AP).
-Those clients are then deauthenticated in order to capture the handshake when attempting to reconnect to the AP.
-Verification of a captured handshake is done using aircrack-ng. If one or more handshakes are captured, they are entered into an SQLite3 database, along with the time of capture and current GPS data (if properly configured).
+Those clients are then deauthenticated in order to capture the PMKID and/or handshake when attempting to reconnect to the AP.
+Verification of captured data is done using hcxpcaptool and hcxpcapngtool from [hcxtools](https://github.com/ZerBea/hcxtools) by [ZeroBeat](https://github.com/ZerBea). If one or more PMKIDs and/or handshakes are captured, they are entered into an SQLite3 database, along with the time of capture and current GPS data (if properly configured).
 
 After capture, the database can be tested for vulnerable router models using `crackdefault.sh`.
 It will search for entries that match the implemented modules, which currently include algorithms to compute default keys for
 Speedport 500-700 series, Thomson/SpeedTouch, UPC 7 digits (UPC1234567) and HOTBOX routers.
+
+For more information on the PMKID attack, [New attack on WPA/WPA2 using PMKID](https://hashcat.net/forum/thread-7717.html) is a good read.
 
 ## Sample Run
 
@@ -23,15 +25,15 @@ aircrack-ng (for Android [android_aircrack](https://github.com/kriswebdev/androi
 
 SQLite3 (Android: installed by default on CyanogenMod 10.2)
 
-[wlanhc2hcx](https://github.com/ZerBea/hcxtools/blob/master/wlanhc2hcx.c) from [hcxtools](https://github.com/ZerBea/hcxtools) (Optional, used for converting .cap files to .hccapx files for hashcat)
+openssl for compilation of modules and hcxtools
 
-openssl for compilation of modules (optional, not used for handshake capture)
+hcxpcaptool and hcxpcapngtool from [hcxtools](https://github.com/ZerBea/hcxtools) for detection of PMKIDs and/or handshakes and conversion to hashcat formats
 
-In order to log GPS coordinates of handshakes, configure your coordinate logging software to log to .loc/\_.txt (the filename can be chosen as desired). Airbash will always use the output of `cat "$path$loc"*.txt 2>/dev/null | sed '2q;d'`, which equals to reading all .txt files in .loc/ and picking the second line. The reason for this way of implementation is the functionality of [GPSLogger](https://play.google.com/store/apps/details?id=com.mendhak.gpslogger&hl=en), which was used on the development device.
+In order to log GPS coordinates of access points, configure your coordinate logging software to log to .location/\_.txt (the filename can be chosen as desired). Airbash will always use the output of `cat "$path$loc"*.txt 2>/dev/null | sed '2q;d'`, which equals to reading all .txt files in .loc/ and picking the second line. The reason for this way of implementation is the functionality of [GPSLogger](https://play.google.com/store/apps/details?id=com.mendhak.gpslogger&hl=en), which was used on the development device.
 
 ## Calculating default keys
 
-After capturing a new handshake, the database can be queried for vulnerable router models. If a module applies,
+After capturing a new PMKID or handshake, the database can be queried for vulnerable router models. If a module applies,
 the default keys for this router series are calculated and used as input for aircrack-ng to try and recover
 the passphrase.
 
@@ -91,6 +93,8 @@ The database contains a table called `hs` with seven columns.
 `essid`: Name identifier
 
 `psk`: WPA Passphrase, if known
+
+`pmkid`: WPA PMKID, if captured
 
 `prcsd`: Flag that gets set by crackdefault.sh to prevent duplicate calculation of default keys if a custom passphrase was used.
 
