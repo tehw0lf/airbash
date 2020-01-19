@@ -1,9 +1,12 @@
 # This script is part of airbash (https://github.com/tehw0lf/airbash)
 # Written by tehw0lf
-# Execution of this script will search the handshake database for entries
+# Execution of this script will search the capture database for entries
 # that have not been cracked yet and then try to match the SSID with
 # routers that have known vulnerabilities. Subsequently, the default
 # passwords for any found matches are calculated and tested using aircrack-ng (https://aircrack-ng.org)
+#
+# please note that this script does not support pmkid cracking yet to retain compatibility with android-19
+# it will most likely be added soon though
 
 AIRCRACK_BIN=$(which aircrack-ng)
 SQLITE3_BIN=$(which sqlite3)
@@ -11,22 +14,22 @@ SQLITE3_BIN=$(which sqlite3)
 # configure path and file names
 export PATH="$PATH:modules:bin"
 working_directory=$(realpath .)
-handshake_directory="$working_directory/.handshakes"
+output_directory="$working_directory/.output"
 wordlist_directory="$working_directory/.wordlists"
 database_file=".database.sqlite3"
 IFS=$'\n'
-for handshake_data in $("$SQLITE3_BIN" "$working_directory/$database_file" "SELECT * FROM handshakes WHERE psk IS NULL AND processed IS NULL" 2>/dev/null); do
+for handshake_data in $("$SQLITE3_BIN" "$working_directory/$database_file" "SELECT * FROM captures WHERE psk IS NULL AND processed IS NULL" 2>/dev/null); do
   unset IFS
   # get ssids for current handshake
   bssid=$(echo "$handshake_data" | awk -F '|' '{print $4}')
   essid=$(echo "$handshake_data" | awk -F '|' '{print $5}')
 
   # check against list of known passwords
-  psk=$("$AIRCRACK_BIN" "$handshake_directory/$bssid"*.cap -w "$wordlist_directory"known_passwords 2>/dev/null | grep FOUND | sort -u | awk '{print $4}')
+  psk=$("$AIRCRACK_BIN" "$output_directory/$bssid"*.cap -w "$wordlist_directory"known_passwords 2>/dev/null | grep FOUND | sort -u | awk '{print $4}')
   if [ ${#psk} -gt 7 ]; then
     echo "Key found for BSSID $bssid: $psk"
-    "$SQLITE3_BIN" "$working_directory/$database_file" "UPDATE handshakes SET psk='$psk', processed=1 WHERE bssid='$bssid';" 2>/dev/null
-    mv "$handshake_directory/$bssid"* "$handshake_directory".cracked/ 2>/dev/null
+    "$SQLITE3_BIN" "$working_directory/$database_file" "UPDATE captures SET psk='$psk', processed=1 WHERE bssid='$bssid';" 2>/dev/null
+    mv "$output_directory/$bssid"* "$output_directory"/.cracked/ 2>/dev/null
     continue
   fi
 
@@ -53,15 +56,15 @@ for handshake_data in $("$SQLITE3_BIN" "$working_directory/$database_file" "SELE
     . upc7d.sh
 
   # HOTBOX
-  elif [[ `echo $essid | grep -c -oE 'HOTBOX-'` -gt 0  ]]; then
+  elif [[ $(echo $essid | grep -c -oE 'HOTBOX-') -gt 0 ]]; then
     echo "HOTBOX detected, computing default keys"
     . hotbox.sh
-  
-  # template for module creation
+
+    # template for module creation
     #	elif [[ `echo $essid | grep -c -oE 'SSIDSTYLE'` -gt 0  ]]; then
     #		echo "Template detected, computing default keys"
     #		. template.sh
   fi
 done
 
-rm -f "$handshake_directory/".cracked/*.cap 2>/dev/null
+rm -f "$output_directory/".cracked/*.cap 2>/dev/null
