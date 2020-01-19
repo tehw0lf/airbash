@@ -68,7 +68,7 @@ save_to_database() {
   # empty bssids will not be saved
   location_output=$(sed '2q;d' "$location_directory/"*.txt 2>/dev/null)
 
-  bssid=$(cat "$1".networklist | uniq | awk -F ':' '{print toupper($1)}' | sed -e 's/[0-9A-F]\{2\}/&:/g' -e 's/:$//')
+  bssid=$(uniq "$1".networklist | awk -F ':' '{print toupper($1)}' | sed -e 's/[0-9A-F]\{2\}/&:/g' -e 's/:$//')
   essid=$(cat "$1".essidlist)
   pmkid=$(cat "$1".16800 2>/dev/null)
   latitude=$(echo "$location_output" | awk -F ',' '{print $2}')
