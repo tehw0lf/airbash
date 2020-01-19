@@ -14,7 +14,7 @@ check_for_pmkid_or_handshake() {
   # $1 = access point MAC address
   # checks a .cap file for either PMKID or 4-way handshake using
   # extract information to temporary folder and only move if successful
-  # returns "1" on success and "0" on failure
+  # sets capture flag to "1" on success and to "0" on failure
   labcounter=$((labcounter + 1))
   pmkid_or_handshake_captured="0"
   tempdirectory="$base_directory/lab$labcounter"
@@ -37,13 +37,11 @@ check_all_and_update_database() {
       continue
     fi
     if [ $(ls "$output_directory/$mac_address"* 2>/dev/null | wc -l) -gt 0 ]; then
-      #echo "found $mac_address, saving to db"
       save_to_database "$output_directory/$mac_address"
       continue
     fi
     check_for_pmkid_or_handshake "$mac_address"
     if [ "$pmkid_or_handshake_captured" == "1" ]; then
-      #echo "NEW $mac_address saved"
       save_to_database "$output_directory/$mac_address"
       pmkid_or_handshake_counter=$((pmkid_or_handshake_counter + 1))
     fi
@@ -65,7 +63,9 @@ kill_airodump_processes() {
 }
 
 save_to_database() {
-  # inserts information into the database (existing bssids will not be replaced as the column is UNIQUE)
+  # inserts information into the database
+  # existing bssids will not be replaced as the column is UNIQUE
+  # empty bssids will not be saved
   location_output=$(sed '2q;d' "$location_directory/"*.txt 2>/dev/null)
 
   bssid=$(cat "$1".networklist | uniq | awk -F ':' '{print toupper($1)}' | sed -e 's/[0-9A-F]\{2\}/&:/g' -e 's/:$//')
@@ -73,7 +73,9 @@ save_to_database() {
   pmkid=$(cat "$1".16800 2>/dev/null)
   latitude=$(echo "$location_output" | awk -F ',' '{print $2}')
   longitude=$(echo "$location_output" | awk -F ',' '{print $3}')
-  "$SQLITE3_BINARY" "$base_directory/$database_filename" "INSERT INTO captures (latitude, longitude, bssid, essid, pmkid) VALUES('$latitude', '$longitude', '$bssid', '$essid', '$pmkid');" 2>/dev/null
+  if [ "$bssid" != "" ]; then
+    "$SQLITE3_BINARY" "$base_directory/$database_filename" "INSERT INTO captures (latitude, longitude, bssid, essid, pmkid) VALUES('$latitude', '$longitude', '$bssid', '$essid', '$pmkid');" 2>/dev/null
+  fi
 
 }
 
