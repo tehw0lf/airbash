@@ -18,7 +18,7 @@ output_directory="$working_directory/.output"
 wordlist_directory="$working_directory/.wordlists"
 database_file=".database.sqlite3"
 IFS=$'\n'
-for handshake_data in $("$SQLITE3_BIN" "$working_directory/$database_file" "SELECT * FROM captures WHERE psk IS NULL AND processed IS NULL" 2>/dev/null); do
+for handshake_data in $("$SQLITE3_BIN" "$working_directory/$database_file" "SELECT * FROM captures WHERE psk = '' AND processed = 0" 2>/dev/null); do
   unset IFS
   # get ssids for current handshake
   bssid=$(echo "$handshake_data" | awk -F '|' '{print $4}')
@@ -28,7 +28,7 @@ for handshake_data in $("$SQLITE3_BIN" "$working_directory/$database_file" "SELE
   psk=$("$AIRCRACK_BIN" "$output_directory/$bssid"*.cap -w "$wordlist_directory"known_passwords 2>/dev/null | grep FOUND | sort -u | awk '{print $4}')
   if [ ${#psk} -gt 7 ]; then
     echo "Key found for BSSID $bssid: $psk"
-    "$SQLITE3_BIN" "$working_directory/$database_file" "UPDATE captures SET psk='$psk', processed=1 WHERE bssid='$bssid';" 2>/dev/null
+    "$SQLITE3_BIN" "$working_directory/$database_file" "UPDATE captures SET psk = '$psk', processed = 1 WHERE bssid='$bssid';" 2>/dev/null
     mv "$output_directory/$bssid"* "$output_directory"/.cracked/ 2>/dev/null
     continue
   fi
