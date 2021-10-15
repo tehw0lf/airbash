@@ -58,4 +58,4 @@ if [ ! -d "$installation_path/.location" ]; then
 fi
 
 # seed database
-sqlite3 "$installation_path/.database.sqlite3" "CREATE TABLE captures (id INTEGER PRIMARY KEY NOT NULL, latitude VARCHAR(12), longitude VARCHAR(12), bssid VARCHAR(17) UNIQUE, essid VARCHAR(255), pmkid VARCHAR(255), psk VARCHAR(64), processed INT(1) DEFAULT NULL)"
+sqlite3 "$installation_path/.database.sqlite3" "CREATE TABLE captures (id INTEGER PRIMARY KEY NOT NULL, latitude VARCHAR(12), longitude VARCHAR(12), bssid VARCHAR(17) UNIQUE, essid VARCHAR(255), pmkid VARCHAR(255), psk VARCHAR(64), processed INT(1) DEFAULT 0)"
