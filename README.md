@@ -82,21 +82,21 @@ Airbash can be updated by executing `update.sh`. This will clone the master bran
 
 ## The Database
 
-The database contains a table called `hs` with seven columns.
+The database contains a table called `captures` with seven columns.
 
 `id`: incrementing counter of table entries
 
-`lat` and `lon`: GPS coordinates of the handshake (if available)
+`latitude` and `longitude`: GPS coordinates of the handshake (if available)
 
 `bssid`: MAC address of the access point
 
 `essid`: Name identifier
 
-`psk`: WPA Passphrase, if known
-
 `pmkid`: WPA PMKID, if captured
 
-`prcsd`: Flag that gets set by crackdefault.sh to prevent duplicate calculation of default keys if a custom passphrase was used.
+`psk`: WPA Passphrase, if known
+
+`processed`: Flag that gets set by crackdefault.sh to prevent duplicate calculation of default keys if a custom passphrase was used.
 
 Currently, the SQLite3 database is not password-protected.
 
