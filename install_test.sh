@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-# Install dependencies for wireless security testing
+# Install dependencies for wireless security testing and POSIX compliance tools
 sudo apt-get update
 sudo apt-get install -y \
 aircrack-ng \
@@ -9,7 +9,7 @@ sqlite3 \
 openssl \
 libssl-dev \
 hostapd \
-wpasupplicant \
+wpa-supplicant \
 iw \
 net-tools \
 build-essential \
@@ -22,5 +22,5 @@ sudo modprobe mac80211_hwsim radios=3
 gcc -fomit-frame-pointer -O3 -funroll-all-loops -o modules/st src/stkeys.c -lcrypto
 gcc -O2 -o modules/upckeys src/upc_keys.c -lcrypto
 
-# Run installation script
-bash install.sh
+# Run installation script with POSIX shell
+sh install.sh
