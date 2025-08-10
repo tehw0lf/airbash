@@ -1,0 +1,16 @@
+name: Airbash Testing
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    uses: tehw0lf/workflows/.github/workflows/build-test-publish.yml@main
+    with:
+      tool: bash
+      install: install_test.sh
+      lint: lint.sh
+      test: test.sh
+      event_name: ${{ github.event_name }}
