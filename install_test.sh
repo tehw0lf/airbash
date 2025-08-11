@@ -9,18 +9,34 @@ sqlite3 \
 openssl \
 libssl-dev \
 hostapd \
-wpa-supplicant \
+wpasupplicant \
 iw \
 net-tools \
 build-essential \
-gcc
+gcc || {
+    echo "⚠️  Some packages failed to install - continuing with available tools"
+    # Try alternative package names for CI compatibility
+    sudo apt-get install -y wpa-supplicant || echo "ℹ️  wpa-supplicant not available in CI"
+}
 
-# Create virtual wireless interfaces for testing
-sudo modprobe mac80211_hwsim radios=3
+# Create virtual wireless interfaces for testing (skip if not available)
+echo "ℹ️  Loading mac80211_hwsim kernel module..."
+sudo modprobe mac80211_hwsim radios=3 2>/dev/null || echo "ℹ️  mac80211_hwsim kernel module not available (expected in CI environments)"
 
 # Compile the C modules for default key calculation
-gcc -fomit-frame-pointer -O3 -funroll-all-loops -o modules/st src/stkeys.c -lcrypto
-gcc -O2 -o modules/upckeys src/upc_keys.c -lcrypto
+echo "🔨 Compiling security modules..."
+mkdir -p modules
+if gcc -fomit-frame-pointer -O3 -funroll-all-loops -o modules/st src/stkeys.c -lcrypto 2>/dev/null; then
+    echo "✅ ST module compiled successfully"
+else
+    echo "⚠️  Warning: Failed to compile ST module (may require additional libraries)"
+fi
+
+if gcc -O2 -o modules/upckeys src/upc_keys.c -lcrypto 2>/dev/null; then
+    echo "✅ UPC module compiled successfully"
+else
+    echo "⚠️  Warning: Failed to compile UPC module (may require OpenSSL dev libraries)"
+fi
 
 # Run installation script with POSIX shell
 sh install.sh

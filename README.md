@@ -45,8 +45,8 @@ Credits for the code go to the authors Kevin Devine and <mailto:peter@haxx.in>.
 
 ```bash
 On Linux:
-gcc -fomit-frame-pointer -O3 -funroll-all-loops -o modules/st modules/stkeys.c -lcrypto
-gcc -O2 -o modules/upckeys modules/upc_keys.c -lcrypto
+gcc -fomit-frame-pointer -O3 -funroll-all-loops -o modules/st src/stkeys.c -lcrypto
+gcc -O2 -o modules/upckeys src/upc_keys.c -lcrypto
 ```
 
 In order to enable auto detection, please move the binaries to `airbash/bin` (will be added to `PATH` during execution) or a directory that's on `PATH`.
