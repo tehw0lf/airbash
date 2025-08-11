@@ -58,7 +58,7 @@ else
     exit 1
 fi
 
-if gcc -O3 -Wall -Wextra -o modules/wlanhc2hcx src/wlanhc2hcx.c 2>/dev/null; then
+if gcc -O3 -Wall -Wextra -o modules/wlanhc2hcx src/wlanhc2hcx.c; then
     echo "✅ wlanhc2hcx module compiled successfully"
 else
     echo "⚠️  Warning: Failed to compile wlanhc2hcx module"
