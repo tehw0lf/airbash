@@ -19,9 +19,27 @@ gcc || {
     sudo apt-get install -y wpa-supplicant || echo "ℹ️  wpa-supplicant not available in CI"
 }
 
-# Create virtual wireless interfaces for testing (skip if not available)
-echo "ℹ️  Loading mac80211_hwsim kernel module..."
-sudo modprobe mac80211_hwsim radios=3 2>/dev/null || echo "ℹ️  mac80211_hwsim kernel module not available (expected in CI environments)"
+# Set up Docker-based wireless simulation for CI environments
+echo "🔧 Setting up Docker-based wireless simulation for CI..."
+
+# Ensure Docker is available (required for CI testing)
+if ! command -v docker >/dev/null 2>&1; then
+    echo "❌ Docker is required for CI testing but not found"
+    exit 1
+fi
+
+if ! docker info >/dev/null 2>&1; then
+    echo "❌ Docker daemon is not accessible"
+    exit 1
+fi
+
+echo "✅ Docker detected - setting up WiFi simulation"
+
+# Pull the WiFi simulation Docker image
+echo "📥 Pulling WiFi simulation Docker image..."
+docker pull singelet/linuxkit-mac80211_hwsim:latest
+
+echo "✅ WiFi simulation environment ready for CI testing"
 
 # Compile the C modules for default key calculation
 echo "🔨 Compiling security modules..."
