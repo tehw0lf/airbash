@@ -13,7 +13,8 @@ wpasupplicant \
 iw \
 net-tools \
 build-essential \
-gcc || {
+gcc \
+libpcap-dev || {
     echo "⚠️  Some packages failed to install - continuing with available tools"
     # Try alternative package names for CI compatibility
     sudo apt-get install -y wpa-supplicant || echo "ℹ️  wpa-supplicant not available in CI"
